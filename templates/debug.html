@@ -1,0 +1,16 @@
+{% load static %}
+
+<body>
+    <div id="app">
+        {% csrf_token %}
+        <textarea v-model="left"></textarea>
+        <textarea v-model="right"></textarea>
+        <button @click="run">Run</button>
+        <h2>[[ loading ]]</h2>
+        <p>[[ out ]]<p>
+    </div>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static 'js/debug.js' %}"></script>
+
+</body>
