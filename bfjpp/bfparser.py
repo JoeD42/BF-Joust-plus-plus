@@ -1,5 +1,5 @@
-from bfjpp.lexer import Token, joust_cmds
-from bfjpp.code import *
+from .lexer import Token, joust_cmds
+from .code import *
 
 class JoustSyntaxError(BaseException):
     def __init__(self, msg):

@@ -1,16 +1,22 @@
+{% extends "base.html" %}
 {% load static %}
 
-<body>
+{% block content %}
     <div id="app">
         {% csrf_token %}
-        <textarea v-model="left"></textarea>
-        <textarea v-model="right"></textarea>
+        <textarea v-model="left"></textarea><br/>
+        <textarea v-model="right"></textarea><br/>
         <button @click="run">Run</button>
         <h2>[[ loading ]]</h2>
-        <p>[[ out ]]<p>
+        <gameselect v-for="game in game_select" v-bind:game="game"
+        @showgame="showGame"></gameselect>
+
+        <h2>[[ result === 0 ? "Tie Game (0)" : (result > 0 ? `Right Wins (${result})` : (result < 0 ? `Left Wins (${result})` : "")) ]]</h2>
+
+        <turn v-for="(turn, index) in current_game.turns" v-bind:turn="turn" v-bind:turn_num="index"></turn>
     </div>
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="{% static 'js/debug.js' %}"></script>
 
-</body>
+{% endblock content %}

@@ -1,6 +1,6 @@
-from bfjpp.program import Program
-from bfjpp.bfparser import JoustSyntaxError
-from bfjpp.code import *
+from .program import Program
+from .bfparser import JoustSyntaxError
+from .code import *
 
 def dict2str(dictionary):
     return "".join(["(", ",".join([f"{key}:{dictionary[key]}" for key in dictionary.keys()]), ")"])

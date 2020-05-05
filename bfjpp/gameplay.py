@@ -1,7 +1,7 @@
-from bfjpp.game import *
-from bfjpp.code import *
-from bfjpp.bfparser import JoustSyntaxError
-from bfjpp.program import Program
+from .game import *
+from .code import *
+from .bfparser import JoustSyntaxError
+from .program import Program
 import json
 
 # *************************
@@ -36,7 +36,7 @@ class Turn:
         ])
 
     def toJSON(self):
-        return json.dumps({
+        return {
             "tape": self.tape,
             "l_pos": self.l_pos,
             "r_pos": self.r_pos,
@@ -46,7 +46,7 @@ class Turn:
             "r_cmp": self.r_cmp,
             "l_frame": self.l_frame,
             "r_frame": self.r_frame
-        })
+        }
 
 class Archive:
     def __init__(self, tape_len, polarity, turns, winner):

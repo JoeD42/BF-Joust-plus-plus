@@ -1,6 +1,6 @@
-from bfjpp.bfparser import firstParse, secondParse, JoustSyntaxError
-from bfjpp.lexer import lex
-from bfjpp.code import *
+from .bfparser import firstParse, secondParse, JoustSyntaxError
+from .lexer import lex
+from .code import *
 
 def getFuncs(stream, all_funcs):
     ret = []
