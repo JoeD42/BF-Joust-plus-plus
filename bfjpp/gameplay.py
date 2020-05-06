@@ -220,7 +220,7 @@ class Game:
             #     input("PAUSE")
 
         # -1 for right winning, 1 for left winning, 0 for tie
-        return Archive(self.tape_size, self.polarity, self.archive, (-1 if l_lose else 0) + (1 if r_lose else 0))
+        return Archive(self.tape_size, self.polarity, self.archive, (1 if l_lose else 0) + (-1 if r_lose else 0))
 
 
 

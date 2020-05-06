@@ -1,0 +1,11 @@
+.turn {
+    font-family: monospace;
+}
+
+.active_cell {
+    color: red;
+}
+
+.flag_cell {
+    color: green;
+}
