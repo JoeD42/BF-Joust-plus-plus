@@ -1,4 +1,5 @@
 const CELL_WIDTH = 20;
+const PLAY_INTERVAL = 20;
 
 
 Vue.component("gameselect", {
@@ -42,7 +43,10 @@ let vm = new Vue({
         current_game: { tape_len: 0 },
         canvas: "",
         ctx: "",
-        current_turn: 0
+        current_turn: 0,
+        is_playing: false, // is a game currently being played on the canvas?
+        play_timer: 0, //where we save our interval timer
+        play_slider: "",
     },
     methods: {
         run: function() {
@@ -85,30 +89,87 @@ let vm = new Vue({
         },
         draw: function() {
             this.ctx.fillStyle = "#000000";
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            let offset = Math.floor(CELL_WIDTH / 2);
-            for(let i = -1; i < this.current_game.tape_len + 1; ++i){
-                if(this.current_game.turns[this.current_turn].l_pos){
-                    if(this.current_game.turns[this.current_turn].r_pos){
-                        this.ctx.fillStyle = "#FF00FF";
-                        this.ctx.fillRect(offset, this.canvas.height - Math.floor(CELL_WIDTH/2), CELL_WIDTH, CELL_WIDTH);
-                    } else {
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
+            let offset = Math.floor(CELL_WIDTH / 2) + CELL_WIDTH;
+            let y_offset = Math.floor(this.canvas.height/2) - Math.floor(CELL_WIDTH/2);
 
-                    }
+            for(let i = 0; i < this.current_game.tape_len; ++i){ // draw the tape
+                switch(i){ //color the flags
+                    case 1: this.ctx.fillStyle = "#FF6060"; break;
+                    case (this.current_game.tape_len-2): this.ctx.fillStyle = "#6060FF"; break;
+                    default: this.ctx.fillStyle = "#FFFFFF";
                 }
+
+                if(this.current_game.turns[this.current_turn].tape[i] <= 128){
+                    this.ctx.fillRect(offset, y_offset, CELL_WIDTH, -this.current_game.turns[this.current_turn].tape[i])
+                } else {
+                    this.ctx.fillRect(offset, y_offset + CELL_WIDTH, CELL_WIDTH, -(this.current_game.turns[this.current_turn].tape[i] - 256))
+                }
+
+                offset += CELL_WIDTH;
             }
+
+            offset = Math.floor(CELL_WIDTH/2);
+            for(let i = -1; i < this.current_game.tape_len + 1; ++i){ // draw the program positions
+                if(this.current_game.turns[this.current_turn].l_pos === i){
+                    if(this.current_game.turns[this.current_turn].r_pos === i){
+                        this.ctx.fillStyle = "#FF00FF";
+                    } else {
+                        this.ctx.fillStyle = "#FF0000";
+                    }
+                    this.ctx.fillRect(offset, y_offset, CELL_WIDTH, CELL_WIDTH);
+                } else if(this.current_game.turns[this.current_turn].r_pos === i) {
+                    this.ctx.fillStyle = "#0000FF";
+                    this.ctx.fillRect(offset, y_offset, CELL_WIDTH, CELL_WIDTH);
+                }
+                offset += CELL_WIDTH;
+            }
+
         },
         showGame: function(game) {
+            clearInterval(this.play_timer);
             this.current_game = game;
             this.canvas.width = (game.tape_len + 3) * CELL_WIDTH;
-            this.ctx.fillStyle = "#000000";
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-            // this.ctx.clearRect(10, 10, CELL_WIDTH, CELL_WIDTH);
+            this.current_turn = 0;
+            this.play_slider.max = game.turns.length - 1;
+            this.play_slider.value = 0;
+            this.is_playing = false;
+            this.draw();
+            // this.ctx.fillStyle = "#000000";
+            // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+        stepGame: function() {
+            // step to next turn
+            if(this.current_turn >= this.current_game.turns.length - 1){
+                this.current_turn = this.current_game.turns.length - 1;
+                clearInterval(this.play_timer);
+                this.is_playing = false;
+            } else { this.current_turn += 1; }
+            this.play_slider.value = this.current_turn;
+
+            this.draw();
+        },
+        playGame: function() {
+            if(this.is_playing) { //stop playing
+                this.is_playing = false;
+                clearInterval(this.play_timer);
+            } else { //play
+                if(this.current_turn >= this.current_game.turns.length - 1) { this.current_turn = 0; } //restart when finished
+                this.is_playing = true;
+                this.play_timer = setInterval(this.stepGame, PLAY_INTERVAL);
+            }
+        },
+        sliderMove: function() {
+            this.current_turn = parseInt(this.play_slider.value);
+            if(!this.is_playing) { this.draw(); } //if the game is not playing, draw the new board
         }
     },
     mounted: function() {
         this.canvas = document.getElementById("canvas");
         this.ctx = this.canvas.getContext("2d");
         this.canvas.height = 256 + CELL_WIDTH * 2;
+        this.play_slider = document.getElementById("play_slider");
+        this.play_slider.oninput = this.sliderMove;
+        console.log(this.play_slider)
     }
 })
