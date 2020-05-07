@@ -135,8 +135,6 @@ let vm = new Vue({
             this.play_slider.value = 0;
             this.is_playing = false;
             this.draw();
-            // this.ctx.fillStyle = "#000000";
-            // this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         },
         stepGame: function() {
             // step to next turn
@@ -170,6 +168,5 @@ let vm = new Vue({
         this.canvas.height = 256 + CELL_WIDTH * 2;
         this.play_slider = document.getElementById("play_slider");
         this.play_slider.oninput = this.sliderMove;
-        console.log(this.play_slider)
     }
 })

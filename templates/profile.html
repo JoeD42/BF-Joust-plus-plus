@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>{{ profile.username }}</h2>
+
+    {% if is_current %}
+        <button>New</button>
+    {% endif %}
+
+    {% for program in programs %}
+        <div>
+            {{ program.name }}
+            {{ program.updated }}
+            {% if is_current %}
+                <button>Edit</button>
+            {% endif %}
+        </div>
+    {% empty %}
+        <p>This user has no programs to show</p>
+    {% endfor %}
+{% endblock content %}
