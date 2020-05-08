@@ -27,8 +27,6 @@ def playGame(left, right):
     for i in range(12, 33):
         temp_game = Game(i, False, left_prog, right_prog)
         games.append(temp_game.play().toJSON())
-        # print(json.dumps(games[-1]))
-        # input("")
 
     for i in range(12, 33):
         temp_game = Game(i, True, left_prog, right_prog)
@@ -37,10 +35,11 @@ def playGame(left, right):
     return {
         "error": 0,
         "games": games
-    } # fix
+    }
 
-# raw = "(.)*-1"
-# # with open(r"test.txt", "r") as file:
-# #     raw = file.read()
-
-# print(playGame(raw, ":+|-;>(-)*6>(+)*7>-(+)*17>(-)*12>(+)*8>(-)*7>(+)*8>(+)*3>[(-)*5[+]]>>[(+)*7[-]]>>([(+)*14[-]]>)*3([(-)*14[+]]>)*3[(-)*7[+]]>>[(+)*6[-]]>>([(+)*14[-]]>)*3[(-)*14[+]]>[(+)*14[-]]>[(-)*16[+]]>[(-)*7[+]]"))
+def verifyProgram(raw):
+    try:
+        Program(raw)
+        return { "success": True }
+    except JoustSyntaxError as err:
+        return { "success": False, "msg": err }
