@@ -42,4 +42,4 @@ def verifyProgram(raw):
         Program(raw)
         return { "success": True }
     except JoustSyntaxError as err:
-        return { "success": False, "msg": err }
+        return { "success": False, "msg": err.msg }

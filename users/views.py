@@ -44,13 +44,19 @@ def do_login(request):
     else:
         return HttpResponseRedirect(reverse("users:profile", args=[user.username]))
 
+def do_logout(request):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse("users:login")) # not logged in
+    logout(request)
+    return HttpResponseRedirect("/") # TODO: do reverse when we get it
+
 def profile(request, username):
     user = get_object_or_404(User, username=username)
     shown_progs = []
     if(user == request.user):
         shown_progs = user.savedprogram_set.all()
     else:
-        shown_progs = user.savedprogram_set.filter(private__eq=False)
+        shown_progs = user.savedprogram_set.filter(private=False)
     return render(request, "profile.html", { "profile": user, "is_current": user == request.user, "programs": shown_progs })
 
 
@@ -61,7 +67,7 @@ def program(request, username):
     else:
         to_load = request.GET.get("name", None)
         if to_load == None:
-            return render(request, "program.html", { "new": True }) # create a new program
+            return render(request, "program.html", { "is_new": True, "author": user.username }) # create a new program
         else:
             prog = get_object_or_404(SavedProgram, name=to_load, author=user.pk)
-            return render(request, "program.html", { "program": prog })
+            return render(request, "program.html", { "name": prog.name, "author": prog.author.username })

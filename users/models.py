@@ -9,4 +9,4 @@ class SavedProgram(models.Model):
     private = models.BooleanField()
 
     def __str__(self):
-        return self.name
+        return f"{self.author}.{self.name}"

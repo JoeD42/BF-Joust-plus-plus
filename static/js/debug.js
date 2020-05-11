@@ -55,7 +55,7 @@ let vm = new Vue({
             this.game_select = [];
             result = "";
             axios({
-                url: "../api/debug/",
+                url: "api/debug/",
                 method: "post",
                 headers: {
                     "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
@@ -163,10 +163,27 @@ let vm = new Vue({
         }
     },
     mounted: function() {
+        // canvas stuff
         this.canvas = document.getElementById("canvas");
         this.ctx = this.canvas.getContext("2d");
         this.canvas.height = 256 + CELL_WIDTH * 2;
         this.play_slider = document.getElementById("play_slider");
         this.play_slider.oninput = this.sliderMove;
+
+        // load programs
+        if(got_left_prog){
+            let temp = split(".", got_left_prog);
+            axios({
+                url: `api/get/${temp[0]}/${temp[1]}/`,
+                method: "get",
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                }
+            }).then(response => {
+                console.log(response);
+            }).catch(error => {
+                console.log(error.response);
+            })
+        }
     }
 })

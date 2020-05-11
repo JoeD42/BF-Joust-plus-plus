@@ -1,12 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
     <div id="app">
-        <button>Save<button>
-        
-        <input type="text" />
+        {% csrf_token %}
+        <button @click="save">Save</button>
+        <button @click="remove">Delete</button>
+        <button @click="verify">Verify</button>
 
-        <textarea></textarea>
+        <br/>
+        <h3 style="white-space: pre-wrap;">[[ err_msg ]]</h3>
+        
+        <input type="text" v-model="name"/>
+        <label>Private</label>
+        <input type="checkbox" v-model="private"/>
+
+        <br/>
+
+        <textarea v-model="content"></textarea>
 
     </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        const current_author = "{{ author }}";
+        {% if is_new %}
+            var is_new_program = true;
+        {% else %}
+            var is_new_program = false;
+            var load_name = "{{ name }}";
+        {% endif %}
+    </script>
+    <script src="{% static 'js/edit.js' %}"></script>
 {% endblock content %}

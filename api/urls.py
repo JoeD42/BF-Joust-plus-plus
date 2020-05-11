@@ -7,5 +7,9 @@ urlpatterns = [
     path("debug/", views.debug, name="debug"),
     path("test_debug", views.test_debug),
     path("get/<str:username>/<str:name>/", views.getProgram, name="get"),
-    path("list/<str:username>/", views.listPrograms, name="list")
+    path("list/<str:username>/", views.listPrograms, name="list"),
+    path("edit/<int:pk>/", views.editProgram, name="edit"),
+    path("new/", views.newProgram, name="new"),
+    path("delete/<int:pk>/", views.deleteProgram, name="delete"),
+    path("verify/", views.verify, name="verify"),
 ]

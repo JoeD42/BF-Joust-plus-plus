@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse, HttpResponseServerError
 
 from rest_framework import generics, viewsets, permissions
 from rest_framework.renderers import JSONRenderer
@@ -36,12 +36,12 @@ def verify(request):
     except KeyError:
         return JsonResponse({ "success": False, "msg": "Something went wrong"})
     return JsonResponse( {"success": False, "msg": "Something has gone very wrong"})
-    
+
 def getProgram(request, username, name):
-    prog = get_object_or_404(SavedProgram, author=username, name=name)
+    prog = get_object_or_404(SavedProgram, author=get_object_or_404(User, username=username), name=name)
     if prog.private and request.user != prog.author:
         return HttpResponseForbidden()
-    return JsonResponse(JSONRenderer().render(SavedProgramSerializer(prog).data))
+    return JsonResponse(SavedProgramSerializer(prog).data)
 
 def listPrograms(request, username):
     user = get_object_or_404(User, username=username)
@@ -49,4 +49,48 @@ def listPrograms(request, username):
     if request.user != user: # prevent anyone aside from the author from seeing private programs
         progs.filter(private=False)
     # return list
-    
+    return JsonResponse(SavedProgramSerializer(progs, many=True).data, safe=False)
+
+
+def editProgram(request, pk):
+    prog = get_object_or_404(SavedProgram, pk=pk)
+    if request.user != prog.author:
+        return HttpResponseForbidden() # can't edit programs that aren't yours
+    to_edit = json.loads(request.body.decode("utf-8"))
+    try:
+        name_change = prog.name != to_edit["name"] # only check name uniqueness if the name is changed
+        prog.name = to_edit["name"]
+        if name_change and SavedProgram.objects.filter(name=prog.name, author=request.user).count() > 0: # not a unique name
+            return HttpResponseBadRequest("Already exists!")
+        prog.private = to_edit["private"]
+        prog.content = to_edit["content"]
+        prog.save()
+        return HttpResponse() # good to go
+    except KeyError:
+        return HttpResponseBadRequest() # request didn't have all the info needed
+    return HttpResponseServerError() # don't know how we would get here
+
+
+def newProgram(request):
+    if not request.user.is_authenticated:
+        return HttpResponse("Only users can create new programs!", status=401) # user isn't logged in; can't make a new program if you aren't logged in
+    to_add = json.loads(request.body.decode("utf-8"))
+    try:
+        name = to_add["name"]
+        if SavedProgram.objects.filter(name=name, author=request.user).count() > 0: # not a unique name
+            return HttpResponseBadRequest("Already exists!")
+        private = to_add["private"]
+        new_prog = SavedProgram(author=request.user, name=name, content=to_add.get("content", ""), private=private)
+        new_prog.save()
+        return HttpResponse(new_prog.pk) # good to go
+    except KeyError:
+        return HttpResponseBadRequest() # didn't have all needed info (program name and private status)
+    return HttpResponseServerError() # don't know how we would get here
+
+
+def deleteProgram(request, pk):
+    prog = get_object_or_404(SavedProgram, pk=pk)
+    if request.user != prog.author:
+        return HttpResponseForbidden() # can't edit programs that aren't yours
+    prog.delete()
+    return HttpResponse(request.user.username) # return username of deleted program to help my javascript code on the frontend
