@@ -172,15 +172,29 @@ let vm = new Vue({
 
         // load programs
         if(got_left_prog){
-            let temp = split(".", got_left_prog);
+            let temp = got_left_prog.split(".");
             axios({
-                url: `api/get/${temp[0]}/${temp[1]}/`,
+                url: `/api/get/${temp[0]}/${temp[1]}/`,
                 method: "get",
                 headers: {
                     "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
                 }
             }).then(response => {
-                console.log(response);
+                this.left = response.data.content;
+            }).catch(error => {
+                console.log(error.response);
+            })
+        }
+        if(got_right_prog){
+            let temp = got_right_prog.split(".");
+            axios({
+                url: `/api/get/${temp[0]}/${temp[1]}/`,
+                method: "get",
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                }
+            }).then(response => {
+                this.right = response.data.content;
             }).catch(error => {
                 console.log(error.response);
             })

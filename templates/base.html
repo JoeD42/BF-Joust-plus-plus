@@ -5,11 +5,18 @@
     <head>
         <title>BF Joust++</title>
 
+        <link rel="stylesheet" href="{% static 'css/normalize.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/skeleton.css' %}"/>
         {% block headers %}
         {% endblock headers %}
     </head>
 
     <body>
+        <nav>
+            <a href="">Home</a>
+            <a href="/debug/">Games</a>
+            
+        </nav>
         {% block content %}
         {% endblock content %}
     </body>

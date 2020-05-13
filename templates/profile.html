@@ -14,7 +14,6 @@
             {% if is_current %}
                 <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
             {% endif %}
-            <button>Raw</button>
             <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
         </div>
     {% empty %}

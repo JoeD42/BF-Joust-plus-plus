@@ -35,8 +35,8 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script>
-        var got_left_prog = `{{ left }}`;
-        var got_right_prog = `{{ right }}`;
+        var got_left_prog = {% if left %} `{{ left }}` {% else %} "" {% endif %};
+        var got_right_prog = {% if right %} `{{ right }}` {% else %} "" {% endif %};
     </script>
     <script src="{% static 'js/debug.js' %}"></script>
 
