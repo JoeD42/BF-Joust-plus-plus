@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% comment %}
+    +   increase tape element by one (polarity dependant)
+    -   decrease tape element by one (polarity dependant)
+    <   move pointer away from opponent
+    >   move pointer towards opponent
+    .   do nothing
+    ,   write current tape element to register
+    #   increase register by one (polarity dependant)
+    ~   decrease register by one (polarity dependant)
+    ?	set condition to (tape != 0)
+    =	set condition to (tape == register)
+    !	set condition to (tape != register)
+    &	set condition to (register != 0)
+    [	goto matching ] if condition is false
+    ]	goto matching [ if condition is true
+    :	if condition is false, jump to matching | (or ; if there is no |)
+    |	goto matching ; (this is an else statement, so if we reached this naturally, we should skip it)
+    ;	do nothing (this is the endif, if reached on its own, must act like . to balance timings)
+
+
+    {% cmd %}
+    {* comment *}
+
+
+    {% def funcname arg1 ... :: const1_id const1_value ... %}
+    {% enddef %}
+
+    {% for name ini end step :: name ini step ... %}
+    {% endfor %}
+
+    {% if value %}
+    {% elif value %}
+    {% else %}
+    {% endif %}
+
+    {% call funcname param1 ... %}
+
+    {% block const1_id const1_value ... %}
+    {% endblock %}
+    
+{% endcomment %}
+<div id="app">
+    <h2>The Tape</h2><hr/>
+    <p>
+        Each game takes place on a tape 12 to 32 cells long.
+        The first (and last) cell is the <em>register</em>.
+        The second (and second to last) cell is the <em>flag</em>.
+        Each cell can hold a value from 0 to 255, which wraps around.
+        All cells start with a value of zero at the beginning of the game, except for the flags, which start at 128.
+    </p>
+    <h2>Instructions</h2><hr/>
+</div>
+{% endblock content %}

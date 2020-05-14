@@ -1,0 +1,29 @@
+nav {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    background-color: black;
+    color: white;
+}
+
+#app {
+    width: 95%;
+    min-width: 320px;
+    margin: auto;
+    margin-top: 16px;
+}
+
+textarea {
+    resize: none;
+}
+
+.nav-button {
+    color: white;
+    text-decoration: none;
+    padding: 16px;
+
+}
+
+.login-button {
+    margin-left: auto;
+}

@@ -1,22 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <div id="app">
+        <h2>{{ error }}</h2>
 
-    <h2>{{ error }}</h2>
+        <form action="{% url 'users:do_signup' %}" method="post">
+            {% csrf_token %}
 
-    <form action="{% url 'users:do_signup' %}" method="post">
-    {% csrf_token %}
+            <label for="username">Username: </label>
+            <input type="text" id="username" name="username" required/>
 
-    <label for="username">Username: </label>
-    <input type="text" id="username" name="username" required/>
+            <br/>
 
-    <br/>
+            <label for="password">Password: </label>
+            <input type="password" id="password" name="password" required/>
 
-    <label for="password">Password: </label>
-    <input type="password" id="password" name="password" required/>
+            <br/>
 
-    <br/>
-
-    <input type="submit" value="Sign Up" />
-</form>
+            <input type="submit" value="Sign Up" />
+        </form>
+    </div>
 {% endblock content %}

@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block headers %}
+    <style>
+        textarea {
+            width: 100%;
+            height: 512px;
+        }
+        .private-label {
+            margin-left: 10%;
+        }
+    </style>
+{% endblock headers %}
+
 {% block content %}
     <div id="app">
         {% csrf_token %}
@@ -12,12 +24,12 @@
         <h3 style="white-space: pre-wrap;">[[ err_msg ]]</h3>
         
         <input type="text" v-model="name"/>
-        <label>Private</label>
+        <span class="private-label">Private</span>
         <input type="checkbox" v-model="private"/>
 
         <br/>
 
-        <textarea v-model="content"></textarea>
+        <textarea rows="40" v-model="content"></textarea>
 
     </div>
 

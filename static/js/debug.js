@@ -5,7 +5,7 @@ const PLAY_INTERVAL = 20;
 Vue.component("gameselect", {
     props: ["game"],
     template: `<span class="game-select">
-    <button @click="$emit('showgame', game)">{{ game.winner > 0 ? ">" : game.winner < 0 ? "<" : "=" }}</button>
+    <button class="select-button" @click="$emit('showgame', game)">{{ game.winner > 0 ? ">" : game.winner < 0 ? "<" : "=" }}</button>
     <br v-if="game.tape_len === 32"/></span>`
 })
 
@@ -55,7 +55,7 @@ let vm = new Vue({
             this.game_select = [];
             result = "";
             axios({
-                url: "api/debug/",
+                url: "/api/debug/",
                 method: "post",
                 headers: {
                     "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
@@ -85,7 +85,7 @@ let vm = new Vue({
                     default:
                         this.loading = `Error ${rep.error}: ${rep.err_msg}`;
                 }
-            }).catch(error => {this.loading = `Error: ${error}`;});
+            }).catch(error => {this.loading = `${error}`;});
         },
         draw: function() {
             this.ctx.fillStyle = "#000000";

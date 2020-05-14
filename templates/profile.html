@@ -1,22 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>{{ profile.username }}</h2>
+    <div id="app">
+        <h2>{{ profile.username }}</h2>
 
-    {% if is_current %}
-        <button>New</button>
-    {% endif %}
+        {% if is_current %}
+            <button>New</button>
+        {% endif %}
 
-    {% for program in programs %}
-        <div>
-            {{ program.name }}
-            {{ program.updated }}
-            {% if is_current %}
-                <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
-            {% endif %}
-            <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
-        </div>
-    {% empty %}
-        <p>This user has no programs to show</p>
-    {% endfor %}
+        {% for program in programs %}
+            <div>
+                {{ program.name }}
+                {{ program.updated }}
+                {% if is_current %}
+                    <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
+                {% endif %}
+                <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
+            </div>
+        {% empty %}
+            <p>This user has no programs to show</p>
+        {% endfor %}
+    </div>
 {% endblock content %}

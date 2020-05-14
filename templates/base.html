@@ -7,15 +7,23 @@
 
         <link rel="stylesheet" href="{% static 'css/normalize.css' %}"/>
         <link rel="stylesheet" href="{% static 'css/skeleton.css' %}"/>
+        <link rel="stylesheet" href="{% static 'css/main.css' %}"/>
         {% block headers %}
         {% endblock headers %}
     </head>
 
     <body>
         <nav>
-            <a href="">Home</a>
-            <a href="/debug/">Games</a>
-            
+            <a class="nav-button" href="{% url 'static_apps:index' %}">Home</a>
+            <a class="nav-button" href="{% url 'static_apps:debug' %}">Games</a>
+            <a class="nav-button" href="{% url 'static_apps:rules' %}">Rules</a>
+                {% if this_user %}
+                    <a class="nav-button login-button" href="{% url 'users:profile' this_user %}">{{ this_user }}</a>
+                    <a class="nav-button" href="{% url 'users:do_logout' %}">Logout</a>
+                {% else %}
+                    <a class="nav-button login-button" href="{% url 'users:login' %}">Login</a>
+                    <a class="nav-button" href="{% url 'users:signup' %}">Signup</a>
+                {% endif %}
         </nav>
         {% block content %}
         {% endblock content %}

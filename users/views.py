@@ -12,13 +12,13 @@ def user_signup(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("users:profile", args=[request.user.username])) # if already logged in, open their user profile
     else:
-        return render(request, "signup.html")
+        return render(request, "signup.html", { "this_user": request.user.username })
 
 def user_login(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse("users:profile", args=[request.user.username])) # if already logged in, open their user profile
     else:
-        return render(request, "login.html")
+        return render(request, "login.html", { "this_user": request.user.username })
 
 def do_signup(request):
     try:
@@ -57,7 +57,7 @@ def profile(request, username):
         shown_progs = user.savedprogram_set.all()
     else:
         shown_progs = user.savedprogram_set.filter(private=False)
-    return render(request, "profile.html", { "profile": user, "is_current": user == request.user, "programs": shown_progs })
+    return render(request, "profile.html", { "profile": user, "is_current": user == request.user, "programs": shown_progs, "this_user": request.user.username })
 
 
 def program(request, username):
@@ -70,4 +70,4 @@ def program(request, username):
             return render(request, "program.html", { "is_new": True, "author": user.username }) # create a new program
         else:
             prog = get_object_or_404(SavedProgram, name=to_load, author=user.pk)
-            return render(request, "program.html", { "name": prog.name, "author": prog.author.username })
+            return render(request, "program.html", { "name": prog.name, "author": prog.author.username, "this_user": request.user.username })

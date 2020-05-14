@@ -9,3 +9,14 @@
 .flag_cell {
     color: green;
 }
+
+textarea {
+    font-family: monospace;
+    margin: 2px 2px 8px 2px;
+    width: 100%;
+    height: 102px;
+}
+
+button.select-button {
+    padding: 0px 16px !important; /* This isn't registering, and I have more important things to do than waste more time searching for an answer why, so !important it becomes */
+}
