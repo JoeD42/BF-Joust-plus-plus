@@ -5,7 +5,7 @@
         <h2>{{ profile.username }}</h2>
 
         {% if is_current %}
-            <button>New</button>
+            <a class="button" href="{% url 'users:program' this_user %}">New</a>
         {% endif %}
 
         {% for program in programs %}

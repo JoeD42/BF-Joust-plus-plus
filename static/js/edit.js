@@ -29,6 +29,7 @@ let vm = new Vue({
                     }
                 }).then(response => {
                     is_new_program = false; //once we save, this is out program now
+                    this.err_msg = "Program saved";
                     this.pk = response.data;
                 }).catch(error => {
                     console.log(error.response);
@@ -50,6 +51,8 @@ let vm = new Vue({
                         name: this.name,
                         content: this.content
                     }
+                }).then(response => {
+                    this.err_msg = "Program saved";
                 }).catch(error => {
                     console.log(error.response);
                     if(error.response.data === "Already exists!"){

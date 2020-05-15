@@ -2,55 +2,176 @@
 
 {% block content %}
 {% comment %}
-    +   increase tape element by one (polarity dependant)
-    -   decrease tape element by one (polarity dependant)
-    <   move pointer away from opponent
-    >   move pointer towards opponent
-    .   do nothing
-    ,   write current tape element to register
-    #   increase register by one (polarity dependant)
-    ~   decrease register by one (polarity dependant)
-    ?	set condition to (tape != 0)
-    =	set condition to (tape == register)
-    !	set condition to (tape != register)
-    &	set condition to (register != 0)
-    [	goto matching ] if condition is false
-    ]	goto matching [ if condition is true
-    :	if condition is false, jump to matching | (or ; if there is no |)
-    |	goto matching ; (this is an else statement, so if we reached this naturally, we should skip it)
-    ;	do nothing (this is the endif, if reached on its own, must act like . to balance timings)
-
-
-    {% cmd %}
-    {* comment *}
-
-
     {% def funcname arg1 ... :: const1_id const1_value ... %}
     {% enddef %}
 
-    {% for name ini end step :: name ini step ... %}
-    {% endfor %}
-
-    {% if value %}
-    {% elif value %}
-    {% else %}
-    {% endif %}
-
     {% call funcname param1 ... %}
-
-    {% block const1_id const1_value ... %}
-    {% endblock %}
     
 {% endcomment %}
 <div id="app">
-    <h2>The Tape</h2><hr/>
+    <p>BF Joust++ is based on <a href="https://esolangs.org/wiki/BF_Joust">BF Joust</a>. Any BF Joust program will work
+    in BF Joust++.</p>
+    <h3>The Tape</h3><hr/>
     <p>
-        Each game takes place on a tape 12 to 32 cells long.
+        Each match takes place on a tape 12 to 32 cells long.
         The first (and last) cell is the <em>register</em>.
         The second (and second to last) cell is the <em>flag</em>.
         Each cell can hold a value from 0 to 255, which wraps around.
-        All cells start with a value of zero at the beginning of the game, except for the flags, which start at 128.
+        All cells start with a value of zero at the beginning of the match, except for the flags, which start at 128.
     </p>
-    <h2>Instructions</h2><hr/>
+    <h3>The Game</h3><hr/>
+    <p>
+        At the start of each match, the programs start on their flag. A program loses when:
+        <ul>
+            <li>That program's flag has a value of zero for two conescutive turns, or</li>
+            <li>The program moves outside the bounds of the tape
+            (<code>&lt;</code> on their register or <code>&gt;</code> on the opponent's register)</li>
+        </ul>
+        Each game consists of 42 matches: 21 matches on tape lengths 12 to 32, and 21 matches on those same tape length's
+        with polarity inversed. Inversed polarity means that for one of the programs, <code>+</code> is switched with
+        <code>-</code> and <code>#</code> is switched with <code>~</code>.
+    </p>
+    <h3>Instructions</h3><hr/>
+    <p>
+        <div class="row">
+            <div class="one column"><code>&gt;</code></div>
+            <div class="ten columns">move pointer towards opponent</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>&lt;</code></div>
+            <div class="ten columns">move pointer away from opponent</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>+</code></div>
+            <div class="ten columns">increase tape element by one (polarity dependant)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>-</code></div>
+            <div class="ten columns">decrease tape element by one (polarity dependant)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>.</code></div>
+            <div class="ten columns">do nothing</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>,</code></div>
+            <div class="ten columns">write current tape element to register</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>#</code></div>
+            <div class="ten columns">increase register by one (polarity dependant)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>~</code></div>
+            <div class="ten columns">decrease register by one (polarity dependant)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>?</code></div>
+            <div class="ten columns">set condition to (tape != 0)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>=</code></div>
+            <div class="ten columns">set condition to (tape == register)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>!</code></div>
+            <div class="ten columns">set condition to (tape != register)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>&amp;</code></div>
+            <div class="ten columns">set condition to (register != 0)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>[</code></div>
+            <div class="ten columns">goto matching ] if condition is false</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>]</code></div>
+            <div class="ten columns">goto matching [ if condition is true</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>:</code></div>
+            <div class="ten columns">if condition is false, jump to matching | (or ; if there is no |)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>|</code></div>
+            <div class="ten columns">goto matching ; (this is an else statement)</div>
+        </div>
+        <div class="row">
+            <div class="one column"><code>;</code></div>
+            <div class="ten columns">do nothing (this is the endif)</div>
+        </div>
+    </p>
+    <h3>Preprocessing</h3><hr/>
+    <p>
+        BF Joust++ has some commands that make code shorter, easier to read, and easier to make. These commands aren't instructions;
+        they do not use a step to execute. They also do not fundamentally change the game: theoretically speaking, if one had
+        infinite time and memory, <strong>there is nothing these commands could do that couldn't be programmed manually.</strong>
+    </p>
+    <h4>Comments</h4>
+    <p>
+        Anything between <code>{*</code> and <code>*}</code> is ignored and will not be executed.
+    </p>
+    <h4>Basic Loop</h4>
+    <p>
+        Repeating code can be expressed with <code>(CODE)*LOOPS</code>. If LOOPS has a negative value, it will repeat forever.
+        As an example, <code>(+-)*5</code> is equivilent to <code>+-+-+-+-+-</code>.
+    </p>
+    <h4>Nested Loop</h4>
+    <p>
+        Repeating code that would contain any unmatched <code>[</code> <code>]</code> <code>:</code> <code>|</code>
+        or <code>;</code>. This can be expressed as <code>(A{B}C)%LOOPS</code>. As an example, <code>([-{.}]>)%4</code>
+        is equivilent to <code>[-[-[-[-.]>]>]>]></code>.
+    </p>
+    <h4>Values</h4>
+    <p>
+        For Basic Loops and Nested Loops, plain numbers were used in the examples. However, variables and even expressions
+        can be used instead. Using variables is simple: instead of a number (<code>(.)*5</code>), use the variable name
+        (<code>(.)*var</code>). For expressions, simply put the expression between <code>{&#37;</code> and <code>&#37;}</code>.
+        As an example, <code>(.)*{&#37;5 + 7 - 2&#37;}</code> is equivilent to <code>(.)*10</code>. <!--TODO: List operations-->
+    </p>
+    <h4>Blocks</h4>
+    <p>
+        Blocks are a way to declare variables in certain parts of code. They are expressed as:<br/>
+        <code>{&#37; block VAR_NAME VAR_VALUE ... &#37;} CODE {&#37; endblock &#37;}</code><br/>
+        All code inside the block will have access to all variables declared by the block. For VAR_VALUE, the same way of
+        using values described above still holds, except expressions must be inside () instead of {&#37;&#37;}. Multiple variables
+        can be declared by a block.
+    </p>
+    <h4>For Loop</h4>
+    <p>
+        For loops act much the same way they do in most other programming languages. They are expressed as:<br/>
+        <code>{&#37; for NAME INI END STEP :: NAME1 INI1 STEP1 ... &#37;} CODE {&#37; endfor &#37;}</code><br/>
+        where NAME is the name of the loop variable, INI is the initial value of the loop variable, END is the value that
+        when reached or surpassed ends the loop, and STEP is how to change the loop variable every loop.
+        In essence, it behaves like:<br/>
+        <code>for(int NAME = INI; NAME < END; NAME += STEP){CODE}</code><br/>
+        The <code>::</code> and eveything after it is optional; they specify other variables that change with the loop, but
+        don't affect when it stops. There can be any number of these extra variables as long as they all have a name, ini, and step,
+        in that order. If there are no extra variables specified, do not include the <code>::</code>.<br/>
+        It should also be noted that if STEP is negative, the loop will instead continue while <code>NAME > END</code>.
+    </p>
+    <h4>If Statements</h4>
+    <p>
+        If statements act much the same way they do in most other programming languages. They can be expressed as:<br/>
+        <code>{&#37; if VALUEA &#37;} CODEA {&#37; elif VALUEB &#37;} CODEB {&#37; else &#37;} CODEC {&#37; endif &#37;}</code><br/>
+        The elif and else are optional, and there can be as many elif's as you want. Remember that for the value, if you want an 
+        expression, it must be inside parenthesis. <!--TODO: More detail-->
+    </p>
+    <h4>Function Definitions</h4>
+    <p>
+        Function definitions define functions for later use in the program. The code in the function isn't executed until that
+        function is called. It is expressed as:<br/>
+        <code>{&#37; def ARG1 ... :: NAME1 VALUE1 ... &#37;}CODE{&#37; enddef &#37;}</code><br/>
+        Arguments are defined only by their name, and any number of arguments are allowed. The <code>::</code> and everything
+        after act like declaring variables in the Blocks.
+    </p>
+    <h4>Function Call</h4>
+    <p>
+        Calls a defined function. Expressed as:<br/>
+        <code>{&#37; call FUNC PARAM1 ... &#37;}</code><br/>
+        where FUNC is the name of the function and the parameters are values (number, variable, expression).
+    </p>
+
 </div>
 {% endblock content %}

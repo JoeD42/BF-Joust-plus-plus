@@ -26,11 +26,11 @@ def do_signup(request):
         new_user.save()
         login(request, new_user)
     except KeyError:
-        return render(request, "signup.html", { "error": "Uh-oh! An error occurred!" })
+        return render(request, "signup.html", { "error": "Uh-oh! An error occurred!", "this_user": request.user.username })
     except IntegrityError:
-        return render(request, "signup.html", { "error": "That Username already exists!" })
+        return render(request, "signup.html", { "error": "That Username already exists!", "this_user": request.user.username })
     else:
-        return HttpResponseRedirect(reverse("users:profile", args=[user.username]))
+        return HttpResponseRedirect(reverse("users:profile", args=[new_user.username]))
 
 def do_login(request):
     try:
@@ -38,9 +38,9 @@ def do_login(request):
         if user:
             login(request, user)
         else:
-            return render(request, "login.html", { "error": "Username or password is incorrect" })
+            return render(request, "login.html", { "error": "Username or password is incorrect", "this_user": request.user.username })
     except KeyError:
-        return render(request, "login.html", { "error": "Uh-oh! An error occurred!" })
+        return render(request, "login.html", { "error": "Uh-oh! An error occurred!", "this_user": request.user.username })
     else:
         return HttpResponseRedirect(reverse("users:profile", args=[user.username]))
 
@@ -67,7 +67,7 @@ def program(request, username):
     else:
         to_load = request.GET.get("name", None)
         if to_load == None:
-            return render(request, "program.html", { "is_new": True, "author": user.username }) # create a new program
+            return render(request, "program.html", { "is_new": True, "author": user.username, "this_user": request.user.username }) # create a new program
         else:
             prog = get_object_or_404(SavedProgram, name=to_load, author=user.pk)
             return render(request, "program.html", { "name": prog.name, "author": prog.author.username, "this_user": request.user.username })
