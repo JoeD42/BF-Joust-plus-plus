@@ -102,6 +102,21 @@ let vm = new Vue({
                 console.log(error.response);
                 this.err_msg = "An error occurred while trying to verify!";
             });
+        },
+        play: function() {
+            if(this.pk == 0){
+                this.err_msg = "This program has not been saved, and therefore cannot be debugged!"
+            } else {
+                if(confirm("Would you like to save before debugging?")) { this.save() }
+                window.location.assign(`/debug/?left=${current_author}.${this.name}`);
+            }
+        },
+        test: function() {
+            if(this.pk == 0){
+                this.err_msg = "This program has not been saved, and therefore cannot be tested!"
+            } else {
+                if(confirm("Would you like to save before testing?")) { this.save() }
+            }
         }
 
     },

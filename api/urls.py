@@ -12,4 +12,9 @@ urlpatterns = [
     path("new/", views.newProgram, name="new"),
     path("delete/<int:pk>/", views.deleteProgram, name="delete"),
     path("verify/", views.verify, name="verify"),
+
+    path("hill/", views.allHillPrograms.as_view(), name="hill_all"),
+    path("hill/<str:name>/", views.getHillProgram.as_view(), name="hill"),
+    path("submit/<int:pk>/", views.submitHill, name="submit"),
+    path("test/<int:pk>/", views.testHill, name="test"),
 ]

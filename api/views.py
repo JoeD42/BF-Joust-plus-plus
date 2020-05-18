@@ -8,10 +8,12 @@ from rest_framework.renderers import JSONRenderer
 from django.contrib.auth.models import User
 
 from users.models import SavedProgram
+from hill.models import HillProgram, HillGame
 from .permissions import IsAuthorOrPublicReadOnly, IsPublic
-from .serializers import SavedProgramSerializer
+from .serializers import SavedProgramSerializer, HillProgramSerializer, HillGameSerializer
 
 from bfjpp.main import playGame, verifyProgram
+from .hillbackend import playTourney, finalizeTourney, MAX_HILL_SLOTS
 import json
 
 
@@ -94,3 +96,46 @@ def deleteProgram(request, pk):
         return HttpResponseForbidden() # can't edit programs that aren't yours
     prog.delete()
     return HttpResponse(request.user.username) # return username of deleted program to help my javascript code on the frontend
+
+
+class allHillPrograms(generics.ListAPIView):
+    queryset = HillProgram.objects.all()
+    serializer_class = HillProgramSerializer
+
+class getHillProgram(generics.RetrieveAPIView):
+    lookup_field = "name"
+    queryset = HillProgram.objects.all()
+    serializer_class = HillProgramSerializer
+
+def getBreakdown(request, name):
+    prog = get_object_or_404(HillProgram, name=name)
+    games = HillGame.objects.filter(left=prog) | HillGame.objects.filter(right=prog)
+    return JsonResponse(HillGameSerializer(games, many=True).data, safe=False)
+
+
+def submitHill(request, pk):
+    prog = get_object_or_404(SavedProgram, pk=pk)
+    if request.user != prog.author: # can't submit a program that isn't yours!
+        return HttpResponseForbidden()
+
+    prog = HillProgram(author=prog, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
+    results = playTourney(prog)
+    if not result["success"]:
+        return JsonResponse(results)
+
+    finalizeTourney(results)
+
+    return JsonResponse({ "success": True, "message": f"{results['program'].name} is rank {results['program'].rank}, with a score of {results['program'].score}"})
+
+
+def testHill(request, pk):
+    prog = get_object_or_404(SavedProgram, pk=pk)
+    if request.user != prog.author: # can't submit a program that isn't yours!
+        return HttpResponseForbidden()
+
+    prog = HillProgram(author=prog, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
+    results = playTourney(prog)
+    if not result["success"]:
+        return JsonResponse(results)
+
+    return JsonResponse({ "success": True, "message": f"{results['program'].name} is rank {results['program'].rank}, with a score of {results['program'].score}"})

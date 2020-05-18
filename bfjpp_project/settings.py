@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'static_apps.apps.StaticAppsConfig',
     'users.apps.UsersConfig',
+    'hill.apps.HillConfig',
 ]
 
 MIDDLEWARE = [
