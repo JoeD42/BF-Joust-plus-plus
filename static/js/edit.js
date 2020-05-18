@@ -105,17 +105,58 @@ let vm = new Vue({
         },
         play: function() {
             if(this.pk == 0){
-                this.err_msg = "This program has not been saved, and therefore cannot be debugged!"
+                this.err_msg = "This program has not been saved, and therefore cannot be debugged!";
             } else {
-                if(confirm("Would you like to save before debugging?")) { this.save() }
+                if(confirm("Would you like to save before debugging?")) { this.save(); }
                 window.location.assign(`/debug/?left=${current_author}.${this.name}`);
             }
         },
         test: function() {
             if(this.pk == 0){
-                this.err_msg = "This program has not been saved, and therefore cannot be tested!"
+                this.err_msg = "This program has not been saved, and therefore cannot be tested!";
             } else {
-                if(confirm("Would you like to save before testing?")) { this.save() }
+                if(confirm("Would you like to save before testing?")) { this.save(); }
+                this.err_msg = "Testing submission to hill...";
+                axios({
+                    url: `/api/test/${this.pk}`,
+                    method: "get",
+                    headers: {
+                        "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                    }
+                }).then(response => {
+                    if(response.data.success){
+                        this.err_msg = response.data.message;
+                    } else {
+                        this.err_msg = `Error ${response.data.err_msg}`;
+                    }
+                }).catch(error => {
+                    console.log(error.response);
+                    this.err_msg = "An error occurred while trying to test!";
+                })
+            }
+        },
+        submit: function() {
+            if(this.pk == 0){
+                this.err_msg = "This program has not been saved, and therefore cannot be submitted!";
+            } else {
+                if(confirm("Would you like to save before submitting?")) { this.save(); }
+                this.err_msg = "Submitting to hill...";
+                axios({
+                    url: `/api/submit/${this.pk}/`,
+                    method: "post",
+                    headers: {
+                        "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                    }
+                }).then(response => {
+                    if(response.data.success){
+                        this.err_msg = response.data.message;
+                    } else {
+                        this.err_msg = `Error ${response.data.err_msg}`;
+                    }
+                }).catch(error => {
+                    console.log(error.response);
+                    this.err_msg = "An error occurred while trying to submit!";
+                })
             }
         }
 

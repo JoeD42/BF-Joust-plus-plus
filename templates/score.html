@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <h3>The Hill</h3>
+    <div id="app">
+        {% csrf_token %}
+
+        <div class="row">
+            <strong>
+                <div class="two columns">
+                    Rank
+                </div>
+                <div class="six columns">
+                    Program
+                </div>
+                <div class="two columns">
+                    Score
+                </div>
+                <div class="two columns">
+                    Points
+                </div>
+            </strong>
+        </div>
+
+        <program v-for="prog in hill_programs" v-bind:prog="prog"></program>
+
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="{% static 'js/score.js' %}"></script>
+{% endblock content %}

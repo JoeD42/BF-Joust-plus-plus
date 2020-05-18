@@ -118,9 +118,9 @@ def submitHill(request, pk):
     if request.user != prog.author: # can't submit a program that isn't yours!
         return HttpResponseForbidden()
 
-    prog = HillProgram(author=prog, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
+    prog = HillProgram(author=prog.author, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
     results = playTourney(prog)
-    if not result["success"]:
+    if not results["success"]:
         return JsonResponse(results)
 
     finalizeTourney(results)
@@ -133,9 +133,9 @@ def testHill(request, pk):
     if request.user != prog.author: # can't submit a program that isn't yours!
         return HttpResponseForbidden()
 
-    prog = HillProgram(author=prog, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
+    prog = HillProgram(author=prog.author, name=str(prog), content=prog.content, rank=9999, prev_rank=0, points=0, score=0)
     results = playTourney(prog)
-    if not result["success"]:
+    if not results["success"]:
         return JsonResponse(results)
 
     return JsonResponse({ "success": True, "message": f"{results['program'].name} is rank {results['program'].rank}, with a score of {results['program'].score}"})

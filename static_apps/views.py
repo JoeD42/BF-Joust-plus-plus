@@ -11,3 +11,6 @@ def index(request):
 
 def rules(request):
     return render(request, "rules.html", { "this_user": request.user.username })
+
+def scores(request):
+    return render(request, "score.html", { "this_user": request.user.username })
