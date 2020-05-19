@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <select id="program" @change="update" v-model="current_program">
+            <option v-for="prog in hill_programs" v-bind:value="prog.name">[[ prog.name ]]</option>
+        </select>
+
+        <game v-for="game in current_games" v-bind:game="game" v-bind:main="current_program"></game>
+    </div>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        var start_prog = {% if start_prog %} "{{ start_prog }}" {% else %} "" {% endif %};
+    </script>
+    <script src="{% static 'js/breakdown.js' %}"></script>
+{% endblock content %}

@@ -7,7 +7,9 @@ Vue.component("program", {
             {{ prog.prev_rank == 0 ? "new" : prog.prev_rank - prog.rank == 0 ? "--" :
             prog.prev_rank - prog.rank > 0 ? "+" + (prog.prev_rank - prog.rank) : prog.prev_rank - prog.rank }}
         </div>
-        <div class="six columns"><a href="">{{ prog.name }}</a></div>
+        <div class="six columns">
+            <a v-bind:href="'/breakdown?prog=' + prog.name">
+            {{ prog.name }}</a></div>
         <div class="two columns">{{ prog.score }}</div>
         <div class="two columns">{{ prog.points }}</div>
     </div>`

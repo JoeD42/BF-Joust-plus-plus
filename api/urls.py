@@ -17,4 +17,5 @@ urlpatterns = [
     path("hill/<str:name>/", views.getHillProgram.as_view(), name="hill"),
     path("submit/<int:pk>/", views.submitHill, name="submit"),
     path("test/<int:pk>/", views.testHill, name="test"),
+    path("breakdown/<str:name>/", views.getBreakdown, name="breakdown")
 ]

@@ -184,11 +184,35 @@ let vm = new Vue({
             }).catch(error => {
                 console.log(error.response);
             })
+        } else if(got_tleft_prog){
+            axios({
+                url: `/api/hill/${got_tleft_prog}/`,
+                method: "get",
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                }
+            }).then(response => {
+                this.left = response.data.content;
+            }).catch(error => {
+                console.log(error.response);
+            })
         }
         if(got_right_prog){
             let temp = got_right_prog.split(".");
             axios({
                 url: `/api/get/${temp[0]}/${temp[1]}/`,
+                method: "get",
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                }
+            }).then(response => {
+                this.right = response.data.content;
+            }).catch(error => {
+                console.log(error.response);
+            })
+        } else if(got_tright_prog){
+            axios({
+                url: `/api/hill/${got_tright_prog}/`,
                 method: "get",
                 headers: {
                     "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value

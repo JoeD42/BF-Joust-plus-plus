@@ -3,7 +3,10 @@
 
 <html>
     <head>
+        <meta charset="utf-8">
         <title>BF Joust++</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="{% static 'css/normalize.css' %}"/>
         <link rel="stylesheet" href="{% static 'css/skeleton.css' %}"/>
@@ -18,6 +21,7 @@
             <a class="nav-button" href="{% url 'static_apps:debug' %}">Games</a>
             <a class="nav-button" href="{% url 'static_apps:rules' %}">Rules</a>
             <a class="nav-button" href="{% url 'static_apps:scores' %}">Scores</a>
+            <a class="nav-button" href="{% url 'static_apps:breakdown' %}">Breakdown</a>
                 {% if this_user %}
                     <a class="nav-button login-button" href="{% url 'users:profile' this_user %}">{{ this_user }}</a>
                     <a class="nav-button" href="{% url 'users:do_logout' %}">Logout</a>
