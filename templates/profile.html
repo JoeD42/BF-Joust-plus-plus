@@ -16,6 +16,7 @@
                     <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
                 {% endif %}
                 <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
+                <a href="{% url 'static_apps:raw' %}?author={{program.author}}&name={{program.name}}"><button>Raw</button></a>
             </div>
         {% empty %}
             <p>This user has no programs to show</p>

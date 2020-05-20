@@ -1,0 +1,32 @@
+.rawpage {
+    border: 1px solid lightgray;
+    width: 95%;
+    min-width: 320px;
+    margin: auto;
+    margin-top: 8px;
+    padding: 4px;
+}
+.line {
+    font-family: monospace;
+    font-size: 12pt;
+    margin: 0px;
+    width: 100%;
+    display: flex;
+
+    white-space: pre-wrap;
+    word-break: break-all;
+    overflow-wrap: break-all;
+    -ms-word-break: break-all;
+    
+}
+.linenum {
+    color: grey;
+    text-align: right;
+    margin-right: 8px;
+}
+.rawhead {
+    margin: auto;
+    margin-top: 16px;
+    width: 96%;
+    min-width: 320px;
+}

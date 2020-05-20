@@ -10,8 +10,12 @@ Vue.component("program", {
         <div class="six columns">
             <a v-bind:href="'/breakdown?prog=' + prog.name">
             {{ prog.name }}</a></div>
-        <div class="two columns">{{ prog.score }}</div>
-        <div class="two columns">{{ prog.points }}</div>
+        <div class="two columns">
+            <a v-bind:href="'/raw?hill=' + prog.name"><i class="far fa-file-alt"></i></a>
+            <a v-bind:href="'/debug?tleft=' + prog.name"><i class="fas fa-play"></i></a>
+        </div>
+        <div class="one column">{{ prog.score }}</div>
+        <div class="one column">{{ prog.points }}</div>
     </div>`
 })
 

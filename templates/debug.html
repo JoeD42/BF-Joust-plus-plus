@@ -9,9 +9,19 @@
     <div id="app">
         {% csrf_token %}
         <h4>Left Program</h4>
+
         <textarea wrap="off" rows="10" v-model="left"></textarea><br/>
+        <select v-model="loaded_left" @change="loadProgram(true)">
+            <option v-for="prog, index in all_programs" v-bind:value="index">[[prog.name]]</option>
+        </select>
+
         <h4>Right Program</h4>
         <textarea wrap="off" rows="10" v-model="right"></textarea><br/>
+        <select v-model="loaded_right" @change="loadProgram(false)">
+            <option v-for="prog, index in all_programs" v-bind:value="index">[[prog.name]]</option>
+        </select>
+
+        <br/>
         <button @click="run">Run</button>
         <h2>[[ loading ]]</h2>
 
@@ -41,6 +51,7 @@
         var got_right_prog = {% if right %} `{{ right }}` {% else %} "" {% endif %};
         var got_tleft_prog = {% if tleft %} `{{ tleft }}` {% else %} "" {% endif %};
         var got_tright_prog = {% if tright %} `{{ tright }}` {% else %} "" {% endif %};
+        var current_user = {% if this_user %} `{{ this_user }}` {% else %} "" {% endif %};
     </script>
     <script src="{% static 'js/debug.js' %}"></script>
 

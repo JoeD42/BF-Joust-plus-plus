@@ -36,7 +36,13 @@ let vm = new Vue({
     delimiters: ["[[", "]]"],
     data: {
         left: "",
-        right: ":+|-;>(-)*6>(+)*7>-(+)*17>(-)*12>(+)*8>(-)*7>(+)*8>(+)*3>[(-)*5[+]]>>[(+)*7[-]]>>([(+)*14[-]]>)*3([(-)*14[+]]>)*3[(-)*7[+]]>>[(+)*6[-]]>>([(+)*14[-]]>)*3[(-)*14[+]]>[(+)*14[-]]>[(-)*16[+]]>[(-)*7[+]]",
+        right: "",
+        loaded_left: 0,
+        loaded_right: 0,
+        all_programs: [{
+            name: "",
+            content: ""
+        }],
         loading: "",
         result: "",
         game_select: [],
@@ -49,6 +55,13 @@ let vm = new Vue({
         play_slider: "",
     },
     methods: {
+        loadProgram: function(side) {
+            if(side) { //left
+                this.left = this.all_programs[this.loaded_left].content;
+            } else { // right
+                this.right = this.all_programs[this.loaded_right].content;
+            }
+        },
         run: function() {
             this.loading = "Loading...";
             this.current_game = { tape_len: 0 };
@@ -170,6 +183,32 @@ let vm = new Vue({
         this.play_slider = document.getElementById("play_slider");
         this.play_slider.oninput = this.sliderMove;
 
+        // get all programs from hill
+        axios({
+            url: "/api/hill/",
+            method: "get",
+            headers: {
+                "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+            }
+        }).then(response => {
+            this.all_programs = this.all_programs.concat(response.data);
+            console.log("1");
+        }).catch(error => { console.log(error.response); });
+
+        // get all programs from current user
+        if(current_user) {
+            axios({
+                url: `/api/list/${current_user}`,
+                method: "get",
+                headers: {
+                    "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                }
+            }).then(response => {
+                this.all_programs = this.all_programs.concat(response.data);
+                console.log("2");
+            }).catch(error => { console.log(error.response); });
+        }
+
         // load programs
         if(got_left_prog){
             let temp = got_left_prog.split(".");
@@ -181,6 +220,14 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.left = response.data.content;
+                console.log("3");
+                if(got_left_prog.split(".")[0] != current_user){
+                    this.all_programs = this.all_programs.concat(response.data);
+                    this.loaded_left = this.all_programs.length-1;
+                    this.all_programs[this.loaded_left].name = "★" + this.all_programs[this.loaded_left].name;
+                } else {
+                    this.loaded_left = this.all_programs.findIndex(x => x.name === got_left_prog);
+                }
             }).catch(error => {
                 console.log(error.response);
             })
@@ -193,6 +240,7 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.left = response.data.content;
+                this.loaded_left = this.all_programs.findIndex(x => x.name === got_tleft_prog);
             }).catch(error => {
                 console.log(error.response);
             })
@@ -207,6 +255,14 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.right = response.data.content;
+                console.log("4");
+                if(got_right_prog.split(".")[0] != current_user){
+                    this.all_programs = this.all_programs.concat(response.data);
+                    this.loaded_right = this.all_programs.length-1;
+                    this.all_programs[this.loaded_right].name = "★" + this.all_programs[this.loaded_right].name;
+                } else {
+                    this.loaded_right = this.all_programs.findIndex(x => x.name === got_right_prog);
+                }
             }).catch(error => {
                 console.log(error.response);
             })
@@ -219,6 +275,7 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.right = response.data.content;
+                this.loaded_right = this.all_programs.findIndex(x => x.name === got_tright_prog);
             }).catch(error => {
                 console.log(error.response);
             })

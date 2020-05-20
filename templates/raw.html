@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load temptags %}
+{% load static %}
+
+{% block headers %}
+    <link rel="stylesheet" href="{% static 'css/raw.css' %}" />
+{% endblock headers %}
+
+{% block content %}
+    <div class="rawhead row">
+        <div class="four columns"><h4>{{ prog_name }}</h4></div>
+        <div class="two columns">
+            <a href="{% url 'users:profile' author  %}"><h5>{{ author }}</h5></a>
+        </div>
+        <div class="two columns"><a class="button" href="{% url 'static_apps:raw'%}?{% if on_hill %}hill={{ prog_name }}{% else %}author={{ author }}&name={{ prog_name }}{% endif %}&plaintext=true">Plaintext</a></div>
+    </div>
+    <div class="rawpage">
+        {% for line in raw %}
+            <div class="line" id="{{ forloop.counter }}"><span class="linenum">{{ forloop.counter|numspace:max_digits }}</span><div>{{ line }}</div></div>
+        {% endfor %}
+    </div>
+{% endblock content %}

@@ -49,8 +49,7 @@ def listPrograms(request, username):
     user = get_object_or_404(User, username=username)
     progs = SavedProgram.objects.filter(author=user)
     if request.user != user: # prevent anyone aside from the author from seeing private programs
-        progs.filter(private=False)
-    # return list
+        progs = progs.exclude(private=True)
     return JsonResponse(SavedProgramSerializer(progs, many=True).data, safe=False)
 
 
