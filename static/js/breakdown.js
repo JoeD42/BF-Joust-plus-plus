@@ -3,7 +3,8 @@ Vue.component("game", {
     props: ["game", "main"],
     template: `<div>
         <strong><a v-bind:href="'/debug?tleft=' + main + '&tright=' + (game.left === main ? game.right : game.left)">
-            vs {{ game.left === main ? game.right : game.left }}</a></strong><br/>
+            vs {{ game.left === main ? game.right : game.left }}</a>
+            ({{ game.left === main ? game.points : -game.points }})</strong><br/>
         <span v-for="match in game.games">
             {{ match.winner == 0 ? "=" : ((match.winner < 0 && game.left === main)||(match.winner > 0 && game.right == main)) ? "<" : ">" }}
             <br v-if="match.tape_len === 32">

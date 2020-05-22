@@ -38,7 +38,7 @@
             <input type="range" id="play_slider" min="0" max="100" value="0">
         </div>
 
-        <div v-show="current_game.tape_len">
+        <div v-show="current_game.tape_len" class="turn-container">
             <turn v-for="(turn, index) in current_game.turns" v-bind:turn="turn" v-bind:turn_num="index"></turn>
         </div>
     </div>

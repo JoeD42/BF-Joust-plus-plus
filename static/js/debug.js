@@ -17,19 +17,22 @@ Vue.component("tape_cell", {
 
 Vue.component("turn", {
     props: ["turn", "turn_num"],
-    template: `<div class="turn">
-        {{ !Math.floor(turn_num/10000) ? "&nbsp;" : "" }}{{ !Math.floor(turn_num/1000) ? "&nbsp;" : "" }}
-        {{ !Math.floor(turn_num/100) ? "&nbsp;" : "" }}{{ !Math.floor(turn_num/10) ? "&nbsp;" : "" }}{{turn_num}}:
+    computed: {
+        spacedTurn: function() {
+            return `${"\xa0".repeat(5-String(this.turn_num).length)}${this.turn_num}`;
+        }
+    },
+    template: `<div>
+        {{spacedTurn}}:
         <span class="flag_cell">{{ turn.l_cmp === "?" ? "t!0" : turn.l_cmp === "=" ? "t=r" : turn.l_cmp ? "t!r" : "r!0" }}</span>
         {{ turn.l_pos < 0 || turn.l_pos >= turn.tape.length ? "✖" : turn.tape[1] === 0 ? "⚐" : "⚑" }}
         <tape_cell v-for="(cell, index) in turn.tape"
-        v-bind:cell="cell" v-bind:is_flag="index === 1 || index === (turn.tape.length - 2)"
-        v-bind:l_pos="turn.l_pos === index" v-bind:r_pos="turn.r_pos === index"></tape_cell>&nbsp;
+            v-bind:cell="cell" v-bind:is_flag="index === 1 || index === (turn.tape.length - 2)"
+            v-bind:l_pos="turn.l_pos === index" v-bind:r_pos="turn.r_pos === index"></tape_cell>&nbsp;
         {{ turn.r_pos < 0 || turn.r_pos >= turn.tape.length ? "✖" : turn.tape[turn.tape.length - 2] === 0 ? "⚐" : "⚑" }}
         <span class="flag_cell">{{ turn.r_cmp === "?" ? "t!0" : turn.r_cmp === "=" ? "t=r" : turn.r_cmp ? "t!r" : "r!0" }}</span>
     </div>`
 })
-
 
 let vm = new Vue({
     el: "#app",
@@ -175,7 +178,7 @@ let vm = new Vue({
             if(!this.is_playing) { this.draw(); } //if the game is not playing, draw the new board
         }
     },
-    mounted: function() {
+    mounted: async function() {
         // canvas stuff
         this.canvas = document.getElementById("canvas");
         this.ctx = this.canvas.getContext("2d");
@@ -184,7 +187,7 @@ let vm = new Vue({
         this.play_slider.oninput = this.sliderMove;
 
         // get all programs from hill
-        axios({
+        await axios({
             url: "/api/hill/",
             method: "get",
             headers: {
@@ -192,12 +195,11 @@ let vm = new Vue({
             }
         }).then(response => {
             this.all_programs = this.all_programs.concat(response.data);
-            console.log("1");
         }).catch(error => { console.log(error.response); });
 
         // get all programs from current user
         if(current_user) {
-            axios({
+            await axios({
                 url: `/api/list/${current_user}`,
                 method: "get",
                 headers: {
@@ -205,14 +207,13 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.all_programs = this.all_programs.concat(response.data);
-                console.log("2");
             }).catch(error => { console.log(error.response); });
         }
 
         // load programs
         if(got_left_prog){
             let temp = got_left_prog.split(".");
-            axios({
+            await axios({
                 url: `/api/get/${temp[0]}/${temp[1]}/`,
                 method: "get",
                 headers: {
@@ -220,7 +221,6 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.left = response.data.content;
-                console.log("3");
                 if(got_left_prog.split(".")[0] != current_user){
                     this.all_programs = this.all_programs.concat(response.data);
                     this.loaded_left = this.all_programs.length-1;
@@ -232,7 +232,7 @@ let vm = new Vue({
                 console.log(error.response);
             })
         } else if(got_tleft_prog){
-            axios({
+            await axios({
                 url: `/api/hill/${got_tleft_prog}/`,
                 method: "get",
                 headers: {
@@ -247,7 +247,7 @@ let vm = new Vue({
         }
         if(got_right_prog){
             let temp = got_right_prog.split(".");
-            axios({
+            await axios({
                 url: `/api/get/${temp[0]}/${temp[1]}/`,
                 method: "get",
                 headers: {
@@ -255,7 +255,6 @@ let vm = new Vue({
                 }
             }).then(response => {
                 this.right = response.data.content;
-                console.log("4");
                 if(got_right_prog.split(".")[0] != current_user){
                     this.all_programs = this.all_programs.concat(response.data);
                     this.loaded_right = this.all_programs.length-1;
@@ -267,7 +266,7 @@ let vm = new Vue({
                 console.log(error.response);
             })
         } else if(got_tright_prog){
-            axios({
+            await axios({
                 url: `/api/hill/${got_tright_prog}/`,
                 method: "get",
                 headers: {

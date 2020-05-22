@@ -7,6 +7,7 @@
         <select id="program" @change="update" v-model="current_program">
             <option v-for="prog in hill_programs" v-bind:value="prog.name">[[ prog.name ]]</option>
         </select>
+        <br/>
 
         <game v-for="game in current_games" v-bind:game="game" v-bind:main="current_program"></game>
     </div>
