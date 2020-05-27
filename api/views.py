@@ -12,7 +12,7 @@ from hill.models import HillProgram, HillGame
 from .permissions import IsAuthorOrPublicReadOnly, IsPublic
 from .serializers import SavedProgramSerializer, HillProgramSerializer, HillGameSerializer
 
-from bfjpp.main import playGame, verifyProgram
+from bfjpp.main import playGame, verifyProgram, playSingleGame
 from .hillbackend import playTourney, finalizeTourney, MAX_HILL_SLOTS
 import json
 
@@ -23,6 +23,16 @@ def debug(request):
         left = json.loads(request.body.decode("utf-8"))["left"]
         right = json.loads(request.body.decode("utf-8"))["right"]
         return JsonResponse(playGame(left, right))
+    except KeyError:
+        # print(request.body)
+        return JsonResponse({ "error": 10, "err_msg": "Something went wrong"})
+    return JsonResponse( {"error": 11, "err_msg": "Something has gone very wrong"})
+
+def debugSingle(request, tape_len, polarity):
+    try:
+        left = json.loads(request.body.decode("utf-8"))["left"]
+        right = json.loads(request.body.decode("utf-8"))["right"]
+        return JsonResponse(playSingleGame(left, right, tape_len, polarity == "t"))
     except KeyError:
         # print(request.body)
         return JsonResponse({ "error": 10, "err_msg": "Something went wrong"})

@@ -5,6 +5,7 @@ from . import views
 app_name = "api"
 urlpatterns = [
     path("debug/", views.debug, name="debug"),
+    path("debug/<int:tape_len>/<str:polarity>", views.debugSingle, name="debug_single"),
     path("test_debug", views.test_debug),
     path("get/<str:username>/<str:name>/", views.getProgram, name="get"),
     path("list/<str:username>/", views.listPrograms, name="list"),

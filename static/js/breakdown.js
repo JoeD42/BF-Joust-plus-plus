@@ -1,11 +1,16 @@
 
 Vue.component("game", {
     props: ["game", "main"],
+    methods:{
+        getColor: function(match){
+            return match.winner == 0 ? "grey" :  ((match.winner < 0 && this.game.left === this.main)||(match.winner > 0 && this.game.right == this.main)) ? "blue" : "red" ;
+        }
+    },
     template: `<div>
         <strong><a v-bind:href="'/debug?tleft=' + main + '&tright=' + (game.left === main ? game.right : game.left)">
             vs {{ game.left === main ? game.right : game.left }}</a>
             ({{ game.left === main ? game.points : -game.points }})</strong><br/>
-        <span v-for="match in game.games">
+        <span v-for="match in game.games" v-bind:style="{color: getColor(match)}">
             {{ match.winner == 0 ? "=" : ((match.winner < 0 && game.left === main)||(match.winner > 0 && game.right == main)) ? "<" : ">" }}
             <br v-if="match.tape_len === 32">
         </span>

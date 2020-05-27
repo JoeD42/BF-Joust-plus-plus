@@ -22,13 +22,15 @@
         </select>
 
         <br/>
-        <button @click="run">Run</button>
+        <button @click="runAlt">Run</button>
         <h2>[[ loading ]]</h2>
 
-        <gameselect v-for="game in game_select" v-bind:game="game"
-        @showgame="showGame"></gameselect>
+        <gameselect v-for="game, index in game_select"
+            v-bind:game="index"
+            v-bind:winner="game.winner"
+            @showgame="showGame"></gameselect>
 
-        <h2 v-show="game_select.length">[[ result === 0 ? "Tie Game (0)" : (result > 0 ? `Right Wins (${result})` : `Left Wins (${result})`) ]]</h2>
+        <h2 v-show="game_select.length === 42">[[ result === 0 ? "Tie Game (0)" : (result > 0 ? `Right Wins (${result})` : `Left Wins (${result})`) ]]</h2>
 
         <div v-show="current_game.tape_len">Tape length [[current_game.tape_len]][[ current_game.polarity ? ", polarity inverted" : ""]]</div>
 
@@ -38,8 +40,11 @@
             <input type="range" id="play_slider" min="0" max="100" value="0">
         </div>
 
-        <div v-show="current_game.tape_len" class="turn-container">
-            <turn v-for="(turn, index) in current_game.turns" v-bind:turn="turn" v-bind:turn_num="index"></turn>
+        <div v-show="showTextDisplay" class="turn-container">
+            <turn v-for="(turn, index) in current_game.turns"
+                v-bind:turn="turn"
+                v-bind:turn_num="index"
+                v-bind:tape="current_tape[index]"></turn>
         </div>
     </div>
 

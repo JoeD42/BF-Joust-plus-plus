@@ -8,7 +8,7 @@ import json
 # Archive
 # *************************
 class Turn:
-    def __init__(self, tape, l_pos, r_pos, l_code, r_code, l_cmp, r_cmp, l_frame, r_frame):
+    def __init__(self, tape, l_pos, r_pos, l_code, r_code, l_cmp, r_cmp):
         self.tape = [n for n in tape]
         self.l_pos = l_pos
         self.r_pos = r_pos
@@ -16,8 +16,8 @@ class Turn:
         self.r_code = r_code
         self.l_cmp = l_cmp
         self.r_cmp = r_cmp
-        self.l_frame = l_frame
-        self.r_frame = r_frame
+        # self.l_frame = l_frame
+        # self.r_frame = r_frame
 
     def __str__(self):
         cmps = { "?": "t!0", "=": "t=r", "!": "t!r", "&": "r!0"}
@@ -30,22 +30,22 @@ class Turn:
             ]),
             "",
             cmps[self.r_cmp],
-            f"@{self.r_code}",
-            f"$L({self.l_frame})",
-            f"$R({self.r_frame})"
+            f"@{self.r_code}"
+            # f"$L({self.l_frame})",
+            # f"$R({self.r_frame})"
         ])
 
     def toJSON(self):
         return {
-            "tape": self.tape,
-            "l_pos": self.l_pos,
-            "r_pos": self.r_pos,
-            "l_code": self.l_code,
-            "r_code": self.r_code,
-            "l_cmp": self.l_cmp,
-            "r_cmp": self.r_cmp,
-            "l_frame": self.l_frame,
-            "r_frame": self.r_frame
+            # "tape": self.tape,
+            "lp": self.l_pos,
+            "rp": self.r_pos,
+            "lx": self.l_code,
+            "rx": self.r_code,
+            "lc": self.l_cmp,
+            "rc": self.r_cmp,
+            # "l_frame": self.l_frame,
+            # "r_frame": self.r_frame
         }
 
 class Archive:
@@ -203,7 +203,7 @@ class Game:
             self.r_pos, self.r_cmp = turnAction(r_cmd.cmd, self.r_pos, self.tape, self.polarity, False, self.r_cmp)
 
             # archive turn
-            self.archive.append(Turn(self.tape, self.l_pos, self.r_pos, l_cmd.pos, r_cmd.pos, self.l_cmp, self.r_cmp, str(self.l_stack[-1]) if self.l_stack != [] else "", str(self.r_stack[-1]) if self.r_stack != [] else "").toJSON())
+            self.archive.append(Turn(self.tape, self.l_pos, self.r_pos, l_cmd.pos, r_cmd.pos, self.l_cmp, self.r_cmp).toJSON()) # str(self.l_stack[-1]) if self.l_stack != [] else "", str(self.r_stack[-1]) if self.r_stack != [] else "").toJSON())
 
             # check win conditions
             l_lose = (self.tape[1] == 0 and l_flag == True) or self.l_pos < 0 or self.l_pos >= self.tape_size

@@ -37,6 +37,34 @@ def playGame(left, right):
         "games": games
     }
 
+def playSingleGame(left, right, tape_len, polarity):
+    # compile the programs
+    left_prog = ""
+    try:
+        left_prog = Program(left)
+    except JoustSyntaxError as err:
+        return {
+            "error": -1,
+            "err_msg": err.msg
+        }
+    right_prog = ""
+    try:
+        right_prog = Program(right)
+    except JoustSyntaxError as err:
+        return {
+            "error": 1,
+            "err_msg": err.msg
+        }
+
+    #play the game
+    game = Game(tape_len, polarity, left_prog, right_prog)
+    game = game.play().toJSON()
+    
+    return {
+        "error": 0,
+        "game": game
+    }
+
 def verifyProgram(raw):
     try:
         Program(raw)

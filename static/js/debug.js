@@ -1,12 +1,23 @@
 const CELL_WIDTH = 20;
 const PLAY_INTERVAL = 20;
 
+/*
+    lp, rp = left position, right position
+    lx, rx = left code, right code
+    lc, rc = left cmp, right cmp
+*/
+
+function safeModulo(a, b){
+    if(a >= 0) { return a%b; }
+    else { return b+a; }
+}
+
 
 Vue.component("gameselect", {
-    props: ["game"],
+    props: ["game", "winner"],
     template: `<span class="game-select">
-    <button class="select-button" @click="$emit('showgame', game)">{{ game.winner > 0 ? ">" : game.winner < 0 ? "<" : "=" }}</button>
-    <br v-if="game.tape_len === 32"/></span>`
+    <button class="select-button" @click="$emit('showgame', game)">{{ winner > 0 ? ">" : winner < 0 ? "<" : "=" }}</button>
+    <br v-if="game === 20"/></span>`
 })
 
 Vue.component("tape_cell", {
@@ -16,7 +27,7 @@ Vue.component("tape_cell", {
 })
 
 Vue.component("turn", {
-    props: ["turn", "turn_num"],
+    props: ["turn", "turn_num", "tape"],
     computed: {
         spacedTurn: function() {
             return `${"\xa0".repeat(5-String(this.turn_num).length)}${this.turn_num}`;
@@ -24,13 +35,13 @@ Vue.component("turn", {
     },
     template: `<div>
         {{spacedTurn}}:
-        <span class="flag_cell">{{ turn.l_cmp === "?" ? "t!0" : turn.l_cmp === "=" ? "t=r" : turn.l_cmp ? "t!r" : "r!0" }}</span>
-        {{ turn.l_pos < 0 || turn.l_pos >= turn.tape.length ? "✖" : turn.tape[1] === 0 ? "⚐" : "⚑" }}
-        <tape_cell v-for="(cell, index) in turn.tape"
-            v-bind:cell="cell" v-bind:is_flag="index === 1 || index === (turn.tape.length - 2)"
-            v-bind:l_pos="turn.l_pos === index" v-bind:r_pos="turn.r_pos === index"></tape_cell>&nbsp;
-        {{ turn.r_pos < 0 || turn.r_pos >= turn.tape.length ? "✖" : turn.tape[turn.tape.length - 2] === 0 ? "⚐" : "⚑" }}
-        <span class="flag_cell">{{ turn.r_cmp === "?" ? "t!0" : turn.r_cmp === "=" ? "t=r" : turn.r_cmp ? "t!r" : "r!0" }}</span>
+        <span class="flag_cell">{{ turn.lc === "?" ? "t!0" : turn.lc === "=" ? "t=r" : turn.lc ? "t!r" : "r!0" }}</span>
+        {{ turn.lp < 0 || turn.lp >= tape.length ? "✖" : tape[1] === 0 ? "⚐" : "⚑" }}
+        <tape_cell v-for="(cell, index) in tape"
+            v-bind:cell="cell" v-bind:is_flag="index === 1 || index === (tape.length - 2)"
+            v-bind:l_pos="turn.lp === index" v-bind:r_pos="turn.rp === index"></tape_cell>&nbsp;
+        {{ turn.rp < 0 || turn.rp >= tape.length ? "✖" : tape[tape.length - 2] === 0 ? "⚐" : "⚑" }}
+        <span class="flag_cell">{{ turn.rc === "?" ? "t!0" : turn.rc === "=" ? "t=r" : turn.rc ? "t!r" : "r!0" }}</span>
     </div>`
 })
 
@@ -40,6 +51,8 @@ let vm = new Vue({
     data: {
         left: "",
         right: "",
+        left_cache: "",
+        right_cache: "",
         loaded_left: 0,
         loaded_right: 0,
         all_programs: [{
@@ -50,6 +63,7 @@ let vm = new Vue({
         result: "",
         game_select: [],
         current_game: { tape_len: 0 },
+        current_tape: [],
         canvas: "",
         ctx: "",
         current_turn: 0,
@@ -64,6 +78,108 @@ let vm = new Vue({
             } else { // right
                 this.right = this.all_programs[this.loaded_right].content;
             }
+        },
+        testFigure: function(){ //test the new way of getting the tape by comparing it to the old way
+            let good = true;
+            for(let i = 0; i < this.current_game.turns.length; ++i){
+                for(let k = 0; k < this.current_game.tape_len; ++k){
+                    if(this.current_game.turns[i].tape[k] != this.current_tape[i][k]) {
+                        console.log(k);
+                        good = false;
+                    }
+                }
+                if(!good) {
+                    console.log(i);
+                    console.log(this.current_game.turns[i].tape);
+                    console.log(this.current_tape[i]);
+                    console.log(this.left_cache[this.current_game.turns[i].lx])
+                    console.log(this.right_cache[this.current_game.turns[i].rx])
+                    break;
+                }
+            }
+        },
+        figureGame: function(){ // create a game based on the moves given to us; will replace the need to receive and store all tape values for all games
+            let tape = [];
+            let temp_tape = [];
+            this.current_tape = [];
+            for(let i = 0; i < this.current_game.tape_len; ++i){
+                if(i === 1 || i === (this.current_game.tape_len-2)) { tape.push(128); }
+                else { tape.push(0); }
+            }
+            for(let i = 0; i < this.current_game.turns.length; ++i){
+                let now = this.current_game.turns[i];
+                switch(this.left_cache[now.lx]){ //left program
+                    case '+': tape[now.lp] = safeModulo(++tape[now.lp], 256); break;
+                    case '-': tape[now.lp] = safeModulo(--tape[now.lp], 256); break;
+                    case ',': tape[0] = tape[now.lp]; break;
+                    case '#': tape[0] = safeModulo(++tape[0], 256); break;
+                    case '~': tape[0] = safeModulo(--tape[0], 256); break;
+                }
+                switch(this.right_cache[now.rx]){ //right program
+                    case '+': tape[now.rp] = safeModulo(++tape[now.rp], 256); break;
+                    case '-': tape[now.rp] = safeModulo(--tape[now.rp], 256); break;
+                    case ',': tape[this.current_game.tape_len-1] = tape[now.rp]; break;
+                    case '#': tape[this.current_game.tape_len-1] = safeModulo(++tape[this.current_game.tape_len-1], 256); break;
+                    case '~': tape[this.current_game.tape_len-1] = safeModulo(--tape[this.current_game.tape_len-1], 256); break;
+                }
+
+                temp_tape.push(tape.slice());
+            }
+            //this.testFigure();
+            this.current_tape = temp_tape;
+        },
+        runAlt: async function(){ //a different way of doing the run function
+            this.loading = "Loading...";
+            this.current_game = { tape_len: 0 };
+            this.game_select = [];
+            result = "";
+
+            this.left_cache = this.left.length ? this.left : " ";
+            this.right_cache = this.right.length ? this.right : " ";
+
+            let axi_error = false;
+            let pol = ["f", "t"];
+            this.result = 0;
+            for(let i = 0; i < 2; ++i){
+                for(let len = 12; len <= 32; ++len){
+                    await axios({
+                        url: `/api/debug/${len}/${pol[i]}`,
+                        method: "post",
+                        headers: {
+                            "X-CSRFToken": document.querySelector("input[name=csrfmiddlewaretoken]").value
+                        },
+                        data: {
+                            left: this.left,
+                            right: this.right
+                        }
+                    }).then(response => {
+                        let rep = response.data;
+                        switch(rep.error){
+                            case 0:
+                                this.game_select.push(rep.game);
+                                this.result += rep.game.winner;
+                                break;
+                            case -1:
+                                this.loading = `Left Program Error: ${rep.err_msg}`;
+                                axi_error = true;
+                                break;
+                            case 1:
+                                this.loading = `Right Program Error: ${rep.err_msg}`;
+                                axi_error = true;
+                                break;
+                            default:
+                                this.loading = `Error ${rep.error}: ${rep.err_msg}`;
+                                axi_error = true;
+                        }
+                    }).catch(error => {
+                        this.loading = `${error}`;
+                        axi_error = true;
+                    });
+                    if(axi_error){ break; }
+                }
+                if(axi_error){ break; }
+            }
+            if(!axi_error) { this.loading = ""; }
         },
         run: function() {
             this.loading = "Loading...";
@@ -116,10 +232,10 @@ let vm = new Vue({
                     default: this.ctx.fillStyle = "#FFFFFF";
                 }
 
-                if(this.current_game.turns[this.current_turn].tape[i] <= 128){
-                    this.ctx.fillRect(offset, y_offset, CELL_WIDTH, -this.current_game.turns[this.current_turn].tape[i])
+                if(this.current_tape[this.current_turn][i] <= 128){//(this.current_game.turns[this.current_turn].tape[i] <= 128){
+                    this.ctx.fillRect(offset, y_offset, CELL_WIDTH, -this.current_tape[this.current_turn][i])//this.current_game.turns[this.current_turn].tape[i])
                 } else {
-                    this.ctx.fillRect(offset, y_offset + CELL_WIDTH, CELL_WIDTH, -(this.current_game.turns[this.current_turn].tape[i] - 256))
+                    this.ctx.fillRect(offset, y_offset + CELL_WIDTH, CELL_WIDTH, this.current_tape[this.current_turn][i] - 256)//(this.current_game.turns[this.current_turn].tape[i] - 256))
                 }
 
                 offset += CELL_WIDTH;
@@ -127,14 +243,14 @@ let vm = new Vue({
 
             offset = Math.floor(CELL_WIDTH/2);
             for(let i = -1; i < this.current_game.tape_len + 1; ++i){ // draw the program positions
-                if(this.current_game.turns[this.current_turn].l_pos === i){
-                    if(this.current_game.turns[this.current_turn].r_pos === i){
+                if(this.current_game.turns[this.current_turn].lp === i){
+                    if(this.current_game.turns[this.current_turn].rp === i){
                         this.ctx.fillStyle = "#FF00FF";
                     } else {
                         this.ctx.fillStyle = "#FF0000";
                     }
                     this.ctx.fillRect(offset, y_offset, CELL_WIDTH, CELL_WIDTH);
-                } else if(this.current_game.turns[this.current_turn].r_pos === i) {
+                } else if(this.current_game.turns[this.current_turn].rp === i) {
                     this.ctx.fillStyle = "#0000FF";
                     this.ctx.fillRect(offset, y_offset, CELL_WIDTH, CELL_WIDTH);
                 }
@@ -144,13 +260,17 @@ let vm = new Vue({
         },
         showGame: function(game) {
             clearInterval(this.play_timer);
+            this.loading = "Loading match...";
+            game = this.game_select[game]
             this.current_game = game;
             this.canvas.width = (game.tape_len + 3) * CELL_WIDTH;
             this.current_turn = 0;
             this.play_slider.max = game.turns.length - 1;
             this.play_slider.value = 0;
             this.is_playing = false;
+            this.figureGame();
             this.draw();
+            this.loading = "";
         },
         stepGame: function() {
             // step to next turn
@@ -176,7 +296,10 @@ let vm = new Vue({
         sliderMove: function() {
             this.current_turn = parseInt(this.play_slider.value);
             if(!this.is_playing) { this.draw(); } //if the game is not playing, draw the new board
-        }
+        },
+        showTextDisplay: function(){
+            return this.current_game.tape_len && (this.current_game.turns.length == this.current_tape.length);
+        },
     },
     mounted: async function() {
         // canvas stuff
