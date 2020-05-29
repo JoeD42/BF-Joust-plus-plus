@@ -224,6 +224,9 @@ class Game:
 
 
 
+
+
+
 if __name__ == "__main__":
     raw = ""
     with open("test.txt", "r") as file:

@@ -18,7 +18,7 @@ import json
 
 
 
-def debug(request):
+def debug(request): # return the results of a game between two programs
     try:
         left = json.loads(request.body.decode("utf-8"))["left"]
         right = json.loads(request.body.decode("utf-8"))["right"]
@@ -28,7 +28,7 @@ def debug(request):
         return JsonResponse({ "error": 10, "err_msg": "Something went wrong"})
     return JsonResponse( {"error": 11, "err_msg": "Something has gone very wrong"})
 
-def debugSingle(request, tape_len, polarity):
+def debugSingle(request, tape_len, polarity): # returns the results of a single match between two programs
     try:
         left = json.loads(request.body.decode("utf-8"))["left"]
         right = json.loads(request.body.decode("utf-8"))["right"]
@@ -41,7 +41,7 @@ def debugSingle(request, tape_len, polarity):
 def test_debug(request): # this is for testing the json
     return JsonResponse(playGame("", ":+|-;>(-)*6>(+)*7>-(+)*17>(-)*12>(+)*8>(-)*7>(+)*8>(+)*3>[(-)*5[+]]>>[(+)*7[-]]>>([(+)*14[-]]>)*3([(-)*14[+]]>)*3[(-)*7[+]]>>[(+)*6[-]]>>([(+)*14[-]]>)*3[(-)*14[+]]>[(+)*14[-]]>[(-)*16[+]]>[(-)*7[+]]"))
 
-def verify(request):
+def verify(request): # verify a program is without errors
     try:
         ret = json.loads(request.body.decode("utf-8"))["raw"]
         return JsonResponse(verifyProgram(ret))
@@ -49,13 +49,13 @@ def verify(request):
         return JsonResponse({ "success": False, "msg": "Something went wrong"})
     return JsonResponse( {"success": False, "msg": "Something has gone very wrong"})
 
-def getProgram(request, username, name):
+def getProgram(request, username, name): # get a specific SavedProgram
     prog = get_object_or_404(SavedProgram, author=get_object_or_404(User, username=username), name=name)
     if prog.private and request.user != prog.author:
         return HttpResponseForbidden()
     return JsonResponse(SavedProgramSerializer(prog).data)
 
-def listPrograms(request, username):
+def listPrograms(request, username): # list all programs made by a user
     user = get_object_or_404(User, username=username)
     progs = SavedProgram.objects.filter(author=user)
     if request.user != user: # prevent anyone aside from the author from seeing private programs
@@ -63,7 +63,7 @@ def listPrograms(request, username):
     return JsonResponse(SavedProgramSerializer(progs, many=True).data, safe=False)
 
 
-def editProgram(request, pk):
+def editProgram(request, pk): # update a SavedProgram
     prog = get_object_or_404(SavedProgram, pk=pk)
     if request.user != prog.author:
         return HttpResponseForbidden() # can't edit programs that aren't yours
@@ -82,7 +82,7 @@ def editProgram(request, pk):
     return HttpResponseServerError() # don't know how we would get here
 
 
-def newProgram(request):
+def newProgram(request): # create a new SavedProgram
     if not request.user.is_authenticated:
         return HttpResponse("Only users can create new programs!", status=401) # user isn't logged in; can't make a new program if you aren't logged in
     to_add = json.loads(request.body.decode("utf-8"))
@@ -99,7 +99,7 @@ def newProgram(request):
     return HttpResponseServerError() # don't know how we would get here
 
 
-def deleteProgram(request, pk):
+def deleteProgram(request, pk): # delete a SavedProgram
     prog = get_object_or_404(SavedProgram, pk=pk)
     if request.user != prog.author:
         return HttpResponseForbidden() # can't edit programs that aren't yours
@@ -107,22 +107,22 @@ def deleteProgram(request, pk):
     return HttpResponse(request.user.username) # return username of deleted program to help my javascript code on the frontend
 
 
-class allHillPrograms(generics.ListAPIView):
+class allHillPrograms(generics.ListAPIView): # get a list of all programs on the hill
     queryset = HillProgram.objects.all()
     serializer_class = HillProgramSerializer
 
-class getHillProgram(generics.RetrieveAPIView):
+class getHillProgram(generics.RetrieveAPIView): # get a specific program from the hill
     lookup_field = "name"
     queryset = HillProgram.objects.all()
     serializer_class = HillProgramSerializer
 
-def getBreakdown(request, name):
+def getBreakdown(request, name): # get the breakdown of all games played by a program on the hill
     prog = get_object_or_404(HillProgram, name=name)
     games = HillGame.objects.filter(left=prog) | HillGame.objects.filter(right=prog)
     return JsonResponse(HillGameSerializer(games, many=True).data, safe=False)
 
 
-def submitHill(request, pk):
+def submitHill(request, pk): # submit a program to the hill
     prog = get_object_or_404(SavedProgram, pk=pk)
     if request.user != prog.author: # can't submit a program that isn't yours!
         return HttpResponseForbidden()
@@ -137,7 +137,7 @@ def submitHill(request, pk):
     return JsonResponse({ "success": True, "message": f"{results['program'].name} is rank {results['program'].rank}, with a score of {results['program'].score}"})
 
 
-def testHill(request, pk):
+def testHill(request, pk): # simulate submitting a program to the hill, returning the score and rank
     prog = get_object_or_404(SavedProgram, pk=pk)
     if request.user != prog.author: # can't submit a program that isn't yours!
         return HttpResponseForbidden()

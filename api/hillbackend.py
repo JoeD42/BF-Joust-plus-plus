@@ -4,7 +4,7 @@ from bfjpp.main import playGame, verifyProgram
 import json
 
 
-MAX_HILL_SLOTS = 8
+MAX_HILL_SLOTS = 8 # how many programs are allowed on the hill
 
 def getPoints(games):
     points = 0
@@ -12,7 +12,7 @@ def getPoints(games):
         points += game["winner"]
     return points
 
-def getGamePoints(left, right):
+def getGamePoints(left, right): # get the points of a game between two programs
     ret = HillGame.objects.filter(left=left, right=right)
     if not ret:
         ret = HillGame.objects.get(left=right, right=left)
@@ -25,7 +25,7 @@ def getNewGamePoints(games, opp): # for redoScores when the new program and it's
         if game.right.name == opp.name:
             return -game.points # returns the temp_game's points; if you want opp's points, negate the result
         
-def redoScores(progs, temp_prog=None, temp_games=None):
+def redoScores(progs, temp_prog=None, temp_games=None): # calculate new scores
     worth = {}
     num_progs = len(progs) + (1 if temp_prog is not None else 0)
     for prog in progs:
@@ -66,7 +66,7 @@ def redoScores(progs, temp_prog=None, temp_games=None):
                 temp_prog.score += int(worth[opp.name] * game_points / 42 * 100)
 
 
-def playTourney(temp_prog):
+def playTourney(temp_prog): # simulate entering a new or updated program on the hill
     verify = verifyProgram(temp_prog.content) # make sure the program is valid
     if not verify["success"]:
         return {"success": False, "err_msg": verify["err_msg"]}
@@ -102,7 +102,7 @@ def playTourney(temp_prog):
 def sortPrograms(prog):
     return prog.score
 
-def finalizeTourney(play_results):
+def finalizeTourney(play_results): # save the results of playTourney to the database
     # add (and remove) programs to hill
     progs = HillProgram.objects.all()
     if progs.filter(name=play_results["program"].name).count() > 0: # update programs instead of duplicating them

@@ -18,5 +18,6 @@ textarea {
 }
 
 button.select-button {
-    padding: 0px 16px !important; /* This isn't registering, and I have more important things to do than waste more time searching for an answer why, so !important it becomes */
+    padding: 0px 15px !important; /* This isn't registering, and I have more important things to do than waste more time searching for an answer why, so !important it becomes */
+    font-size: 1em !important;
 }

@@ -7,11 +7,11 @@ const PLAY_INTERVAL = 20;
     lc, rc = left cmp, right cmp
 */
 
-function getCmpStr(c) {
+function getCmpStr(c) { // a function to help with the generateText function
     return c === "?" ? "t!0" : c === "=" ? "t=r" : c ? "t!r" : "r!0"
 }
 
-function safeModulo(a, b){
+function safeModulo(a, b){ // modulo correctly accounting for negatives
     if(a >= 0) { return a%b; }
     else { return b+a; }
 }
@@ -56,7 +56,7 @@ let vm = new Vue({
     data: {
         left: "",
         right: "",
-        left_cache: "",
+        left_cache: "", // the programs that were entered; this is to prevent changes to left or right causing errors
         right_cache: "",
         loaded_left: 0,
         loaded_right: 0,
@@ -64,8 +64,8 @@ let vm = new Vue({
             name: "",
             content: ""
         }],
-        loading: "",
-        result: "",
+        loading: "", //loading and error message text
+        result: "", //result of game text
         game_select: [],
         current_game: { tape_len: 0 },
         current_tape: [],
@@ -85,7 +85,7 @@ let vm = new Vue({
                 this.right = this.all_programs[this.loaded_right].content;
             }
         },
-        testFigure: function(){ //test the new way of getting the tape by comparing it to the old way
+        /*testFigure: function(){ //test the new way of getting the tape by comparing it to the old way
             let good = true;
             for(let i = 0; i < this.current_game.turns.length; ++i){
                 for(let k = 0; k < this.current_game.tape_len; ++k){
@@ -103,8 +103,8 @@ let vm = new Vue({
                     break;
                 }
             }
-        },
-        figureGame: function(){ // create a game based on the moves given to us; will replace the need to receive and store all tape values for all games
+        },*/
+        figureGame: function(){ // create a game based on the moves given to us; will replace the need to receive and store all tape values for all matches
             let tape = [];
             let temp_tape = [];
             this.current_tape = [];
@@ -134,7 +134,7 @@ let vm = new Vue({
             //this.testFigure();
             this.current_tape = temp_tape;
         },
-        runAlt: async function(){ //a different way of doing the run function
+        runAlt: async function(){ //a different run function (receiving single matches from api instead of all at once)
             this.loading = "Loading...";
             this.current_game = { tape_len: 0 };
             this.game_select = [];
@@ -236,7 +236,7 @@ let vm = new Vue({
                     let cell = `\xa0${position}${this.current_tape[i][k] < 16 ? "0" : ""}${this.current_tape[i][k].toString(16).toUpperCase()}`;
                     if(color){
                         tape.push(`<span class="active_cell">${cell}</span>`)
-                    } else if(k === 1 || k === this.current_game.tape_len){
+                    } else if(k === 1 || k === this.current_game.tape_len-2){
                         tape.push(`<span class="flag_cell">${cell}</span>`)
                     } else {
                         tape.push(cell);
@@ -332,7 +332,7 @@ let vm = new Vue({
                 this.play_timer = setInterval(this.stepGame, PLAY_INTERVAL);
             }
         },
-        sliderMove: function() {
+        sliderMove: function() { //change the current turn to the value of the slider
             this.current_turn = parseInt(this.play_slider.value);
             if(!this.is_playing) { this.draw(); } //if the game is not playing, draw the new board
         },
@@ -341,7 +341,7 @@ let vm = new Vue({
         },
     },
     mounted: async function() {
-        // canvas stuff
+        // canvas initialization
         this.canvas = document.getElementById("canvas");
         this.ctx = this.canvas.getContext("2d");
         this.canvas.height = 256 + CELL_WIDTH * 2;
@@ -372,7 +372,7 @@ let vm = new Vue({
             }).catch(error => { console.log(error.response); });
         }
 
-        // load programs
+        // load programs from url
         if(got_left_prog){
             let temp = got_left_prog.split(".");
             await axios({

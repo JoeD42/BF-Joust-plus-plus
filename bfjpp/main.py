@@ -2,7 +2,7 @@ from .bfparser import JoustSyntaxError
 from .program import Program
 from .gameplay import Turn, Archive, Game
 
-def playGame(left, right):
+def playGame(left, right): #return the results of a game between two programs
     # compile the programs
     left_prog = ""
     try:
@@ -37,7 +37,7 @@ def playGame(left, right):
         "games": games
     }
 
-def playSingleGame(left, right, tape_len, polarity):
+def playSingleGame(left, right, tape_len, polarity): # return the results of a single match between two programs
     # compile the programs
     left_prog = ""
     try:
@@ -65,7 +65,7 @@ def playSingleGame(left, right, tape_len, polarity):
         "game": game
     }
 
-def verifyProgram(raw):
+def verifyProgram(raw): # verify that a program has no errors
     try:
         Program(raw)
         return { "success": True }

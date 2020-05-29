@@ -48,7 +48,7 @@ def do_logout(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect(reverse("users:login")) # not logged in
     logout(request)
-    return HttpResponseRedirect("/") # TODO: do reverse when we get it
+    return HttpResponseRedirect(reverse("static_apps:index"))
 
 def profile(request, username):
     user = get_object_or_404(User, username=username)
