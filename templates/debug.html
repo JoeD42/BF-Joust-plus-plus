@@ -40,12 +40,13 @@
             <input type="range" id="play_slider" min="0" max="100" value="0">
         </div>
 
-        <div v-show="showTextDisplay" class="turn-container">
+        {% comment %} <div v-show="showTextDisplay" class="turn-container">
             <turn v-for="(turn, index) in current_game.turns"
                 v-bind:turn="turn"
                 v-bind:turn_num="index"
                 v-bind:tape="current_tape[index]"></turn>
-        </div>
+        </div> {% endcomment %}
+        <div class="turn-container" v-html="text_out"></div>
     </div>
 
 

@@ -27,3 +27,12 @@ textarea {
 .login-button {
     margin-left: auto;
 }
+
+.login-form {
+    margin: auto;
+    text-align: center;
+    padding: 8px;
+    background-color: #EEEEEE;
+    border-radius: 8px;
+    width: 320px;
+}

@@ -8,15 +8,23 @@
             <a class="button" href="{% url 'users:program' this_user %}">New</a>
         {% endif %}
 
+        <div class="row" style="border-bottom: 1px solid lightgray; margin-bottom: 16px;">
+            <div class="four columns"><h5>Name</h5></div>
+            <div class="two columns"><h5>Updated</h5></div>
+            <div class="six columns"><h5>Options</h5></div>
+        </div>
+
         {% for program in programs %}
-            <div>
-                {{ program.name }}
-                {{ program.updated }}
-                {% if is_current %}
-                    <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
-                {% endif %}
-                <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
-                <a href="{% url 'static_apps:raw' %}?author={{program.author}}&name={{program.name}}"><button>Raw</button></a>
+            <div class="row">
+                <div class="four columns"><strong>{{ program.name }}</strong></div>
+                <div class="two columns">{{ program.updated }}</div>
+                <div class="six columns">
+                    {% if is_current %}
+                        <a href="{% url 'users:program' profile.username %}?name={{ program.name }}"><button>Edit</button></a>
+                    {% endif %}
+                    <a href="{% url 'static_apps:debug' %}?left={{ profile.username }}.{{ program.name }}"><button>Play</button></a>
+                    <a href="{% url 'static_apps:raw' %}?author={{program.author}}&name={{program.name}}"><button>Raw</button></a>
+                </div>
             </div>
         {% empty %}
             <p>This user has no programs to show</p>

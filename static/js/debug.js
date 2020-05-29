@@ -7,6 +7,10 @@ const PLAY_INTERVAL = 20;
     lc, rc = left cmp, right cmp
 */
 
+function getCmpStr(c) {
+    return c === "?" ? "t!0" : c === "=" ? "t=r" : c ? "t!r" : "r!0"
+}
+
 function safeModulo(a, b){
     if(a >= 0) { return a%b; }
     else { return b+a; }
@@ -19,14 +23,14 @@ Vue.component("gameselect", {
     <button class="select-button" @click="$emit('showgame', game)">{{ winner > 0 ? ">" : winner < 0 ? "<" : "=" }}</button>
     <br v-if="game === 20"/></span>`
 })
-
+/* No longer using Vue components to load the text output
 Vue.component("tape_cell", {
     props: ["cell", "is_flag", "l_pos", "r_pos"],
     template: `<span v-bind:class="[l_pos || r_pos ? 'active_cell' : is_flag ? 'flag_cell' : '']">
     {{ l_pos ? r_pos ? "X" : ">" : r_pos ? "<" : "&nbsp;"}}{{ cell < 16 ? "0" : "" }}{{ cell.toString(16).toUpperCase() }}</span>`
 })
 
-Vue.component("turn", {
+Vue.component("turn", { // this component is what's causing the slowdown, not it's sub-component
     props: ["turn", "turn_num", "tape"],
     computed: {
         spacedTurn: function() {
@@ -44,6 +48,7 @@ Vue.component("turn", {
         <span class="flag_cell">{{ turn.rc === "?" ? "t!0" : turn.rc === "=" ? "t=r" : turn.rc ? "t!r" : "r!0" }}</span>
     </div>`
 })
+*/
 
 let vm = new Vue({
     el: "#app",
@@ -66,6 +71,7 @@ let vm = new Vue({
         current_tape: [],
         canvas: "",
         ctx: "",
+        text_out: "",
         current_turn: 0,
         is_playing: false, // is a game currently being played on the canvas?
         play_timer: 0, //where we save our interval timer
@@ -133,6 +139,7 @@ let vm = new Vue({
             this.current_game = { tape_len: 0 };
             this.game_select = [];
             result = "";
+            this.text_out = "";
 
             this.left_cache = this.left.length ? this.left : " ";
             this.right_cache = this.right.length ? this.right : " ";
@@ -219,6 +226,36 @@ let vm = new Vue({
                 }
             }).catch(error => {this.loading = `${error}`;});
         },
+        generateText: function() { //manually write the html for the text output
+            let temp = [];
+            for(let i = 0; i < this.current_tape.length; ++i){
+                let tape = [];
+                for(let k = 0; k < this.current_game.tape_len; ++k){ // tape values
+                    let position = this.current_game.turns[i].lp === k ? (this.current_game.turns[i].rp === k ? "X" : "&gt;") : (this.current_game.turns[i].rp === k ? "&lt;" : "\xa0");
+                    let color = this.current_game.turns[i].lp === k || this.current_game.turns[i].rp === k;
+                    let cell = `\xa0${position}${this.current_tape[i][k] < 16 ? "0" : ""}${this.current_tape[i][k].toString(16).toUpperCase()}`;
+                    if(color){
+                        tape.push(`<span class="active_cell">${cell}</span>`)
+                    } else if(k === 1 || k === this.current_game.tape_len){
+                        tape.push(`<span class="flag_cell">${cell}</span>`)
+                    } else {
+                        tape.push(cell);
+                    }
+                }
+                let turn = `${"\xa0".repeat(5-String(i).length)}${i}`;
+                let l_flag = this.current_game.turns[i].lp < 0 || this.current_game.turns[i].lp >= this.current_game.tape_len ? "✖" : this.current_tape[i][1] === 0 ? "⚐" : "⚑";
+                let r_flag = this.current_game.turns[i].rp < 0 || this.current_game.turns[i].rp >= this.current_game.tape_len ? "✖" : this.current_tape[i][this.current_game.tape_len-2] === 0 ? "⚐" : "⚑";
+
+
+                temp.push(`<div>${turn}:
+                <span class="flag_cell">${getCmpStr(this.current_game.turns[i].lc)}</span>
+                ${l_flag}
+                ${tape.join("")}\xa0\xa0
+                ${r_flag}
+                <span class="flag_cell">${getCmpStr(this.current_game.turns[i].rc)}</span></div>`);
+            }
+            this.text_out = temp.join("");
+        },
         draw: function() {
             this.ctx.fillStyle = "#000000";
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height); // clear canvas
@@ -235,7 +272,7 @@ let vm = new Vue({
                 if(this.current_tape[this.current_turn][i] <= 128){//(this.current_game.turns[this.current_turn].tape[i] <= 128){
                     this.ctx.fillRect(offset, y_offset, CELL_WIDTH, -this.current_tape[this.current_turn][i])//this.current_game.turns[this.current_turn].tape[i])
                 } else {
-                    this.ctx.fillRect(offset, y_offset + CELL_WIDTH, CELL_WIDTH, this.current_tape[this.current_turn][i] - 256)//(this.current_game.turns[this.current_turn].tape[i] - 256))
+                    this.ctx.fillRect(offset, y_offset + CELL_WIDTH, CELL_WIDTH, -(this.current_tape[this.current_turn][i] - 256))//(this.current_game.turns[this.current_turn].tape[i] - 256))
                 }
 
                 offset += CELL_WIDTH;
@@ -261,6 +298,7 @@ let vm = new Vue({
         showGame: function(game) {
             clearInterval(this.play_timer);
             this.loading = "Loading match...";
+            this.text_out = "";
             game = this.game_select[game]
             this.current_game = game;
             this.canvas.width = (game.tape_len + 3) * CELL_WIDTH;
@@ -270,6 +308,7 @@ let vm = new Vue({
             this.is_playing = false;
             this.figureGame();
             this.draw();
+            this.generateText();
             this.loading = "";
         },
         stepGame: function() {

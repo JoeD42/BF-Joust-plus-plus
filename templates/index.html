@@ -4,7 +4,9 @@
     <div id="app">
         <h1>BF Joust++ Hill</h1>
         <p>Welcome to the BF Joust++ Hill!</p>
-        <p>X is top on hill, out of Y programs</p>
-        <p>click here for random game between programs on hill</p>
+        <p><strong>{{ top_hill.name }}</strong> is on the top of the hill, out of {{ num_hill }} programs.</p>
+        <p>Click
+        <a href="{% url 'static_apps:debug' %}?tleft={{ random_left.name }}&tright={{ random_right.name }}">
+        here</a> to see a random game.</p>
     </div>
 {% endblock content %}

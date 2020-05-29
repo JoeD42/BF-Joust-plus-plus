@@ -4,7 +4,7 @@
     <div id="app">
         <h2>{{ error }}</h2>
         
-        <form action="{% url 'users:do_login' %}" method="post">
+        <form action="{% url 'users:do_login' %}" method="post" class="login-form">
             {% csrf_token %}
 
             <label for="username">Username: </label>
